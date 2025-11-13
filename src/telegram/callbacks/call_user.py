@@ -1,0 +1,55 @@
+from aiogram import Dispatcher
+from aiogram.dispatcher import FSMContext
+
+from settings import LOGO
+from src.business.managers.add_managers_call import add_managers_call
+from src.business.managers.check_manager import check_manager
+from src.business.managers.managers_call import managers_call
+from src.business.start_one.start_one import start_one
+from src.business.text_edit.edit_text_call import edit_text_button_call, edit_text_message_call
+from src.business.text_edit.text_keyboards_call import text_keyboards_call
+from src.business.text_edit.text_msg_call import text_msg_call
+from src.telegram.sendler.sendler import *
+
+from src.telegram.keyboard.keyboards import *
+
+
+async def over_state(call: types.CallbackQuery, state: FSMContext):
+    await Sendler_msg.log_client_call(call)
+
+    await state.finish()
+
+    await Sendler_msg.log_client_call(call)
+
+    await start_one(call.message, state)
+
+    return True
+
+
+async def admin_panel(call: types.CallbackQuery):
+    await Sendler_msg.log_client_call(call)
+
+    is_manager = await check_manager(call.message)
+
+    keyb = Admin_keyb().admin_keyboard(is_manager)
+
+    text_admin = 'Меню настроек'
+
+    await Sendler_msg().sendler_photo_call(call, LOGO, text_admin, keyb)
+
+    return True
+
+
+def register_callbacks(dp: Dispatcher):
+    dp.register_callback_query_handler(managers_call, text='managers', state='*')
+
+    dp.register_callback_query_handler(add_managers_call, text='add_managers', state='*')
+
+    dp.register_callback_query_handler(over_state, text='over_state', state='*')
+
+    dp.register_callback_query_handler(admin_panel, text_contains='admin_panel', state='*')
+
+    dp.register_callback_query_handler(text_keyboards_call, text='text_keyboards', state='*')
+    dp.register_callback_query_handler(text_msg_call, text='text_msg', state='*')
+    dp.register_callback_query_handler(edit_text_button_call, text_contains='edit_text_button-', state='*')
+    dp.register_callback_query_handler(edit_text_message_call, text_contains='edit_text_message-', state='*')
