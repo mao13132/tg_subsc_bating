@@ -2,10 +2,16 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
 class Admin_keyb:
-    def start_keyb(self, access_admin):
+    def start_keyb(self, settings):
+        access_admin = settings['access_admin']
+        get_forecast_btn = settings['get_forecast_btn']
+
         self._start_key = InlineKeyboardMarkup(row_width=1)
 
-        self._start_key.add(InlineKeyboardButton(text=f'⚙️ Админ панель', callback_data='admin_panel'))
+        self._start_key.add(InlineKeyboardButton(text=get_forecast_btn, callback_data='get_forecast'))
+
+        if access_admin:
+            self._start_key.add(InlineKeyboardButton(text=f'⚙️ Админ панель', callback_data='admin_panel'))
 
         return self._start_key
 

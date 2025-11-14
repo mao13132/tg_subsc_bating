@@ -16,15 +16,6 @@ async def start(message: Message, state: FSMContext):
         
     await state.finish()
 
-    id_user = message.chat.id
-
-    is_manager = await check_manager(message)
-
-    # if str(id_user) not in ADMIN and not is_manager:
-    #     await Sendler_msg.send_msg_message(message, '⛔️ В доступе отказано', None)
-    # 
-    #     return False
-
     result = await start_one(message, state)
 
     return result

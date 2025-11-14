@@ -1,6 +1,6 @@
 {
   "buttons": {
-    "start": "\uD83C\uDFB2 Получить прогноз"
+    "get_forecast": "\uD83C\uDFB2 Получить прогноз"
   },
   "messages": {
     "welcome": "Выберите действие \uD83D\uDC47\uD83C\uDFFB"

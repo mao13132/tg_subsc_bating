@@ -44,7 +44,11 @@ async def start_one(message: Message, state: FSMContext):
 
     await Sendler_msg.log_client_message(message)
 
-    keyb = Admin_keyb().start_keyb(access_admin)
+    get_forecast_btn = await text_manager.get_button_text('get_forecast')
+
+    settings_start_keyboard = {'access_admin': access_admin, 'get_forecast_btn': get_forecast_btn}
+
+    keyb = Admin_keyb().start_keyb(settings_start_keyboard)
 
     start_message = await text_manager.get_message('welcome')
 
