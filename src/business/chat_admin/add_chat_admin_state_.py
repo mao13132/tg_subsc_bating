@@ -114,7 +114,6 @@ async def add_chat_admin_state(message: Message, state: FSMContext):
         return
 
     # Завершаем состояние FSM
-
     save_chat = await BotDB.update_settings(key=target, value=str(channel_id))
 
     status_text = f'✅ Успешно добавил чат/канал' if save_chat else f'❌ Не смог добавить чат/канал'
