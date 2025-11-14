@@ -12,7 +12,7 @@ from aiogram.types import Message
 from src.business.chat_admin.add_chat_keyboard import ChatAdminKeyb
 from src.telegram.bot_core import BotDB
 
-from settings import SETTINGS_CHATS
+from settings import SETTINGS_CHATS, LOGO
 from src.telegram.sendler.sendler import Sendler_msg
 
 
@@ -85,15 +85,6 @@ async def add_chat_admin_state(message: Message, state: FSMContext):
 
             return False
 
-        if chat.type == 'channel':
-            error_ = f'❌ Нельзя добавлять каналы. Добавьте чат'
-
-            await Sendler_msg.send_msg_message(message, error_, None)
-
-            await state.finish()
-
-            return False
-
     except Exception as e:
         msg = (
             f"❌ Не удалось получить доступ к каналу {channel_id}. Убедитесь, что:\n"
@@ -126,13 +117,13 @@ async def add_chat_admin_state(message: Message, state: FSMContext):
 
     save_chat = await BotDB.update_settings(key=target, value=str(channel_id))
 
-    status_text = f'✅ Успешно добавил чат' if save_chat else f'❌ Не смог добавить чат'
+    status_text = f'✅ Успешно добавил чат/канал' if save_chat else f'❌ Не смог добавить чат/канал'
 
     await state.finish()
 
     keyboard = ChatAdminKeyb().chat_admin_btns(SETTINGS_CHATS)
 
-    await Sendler_msg.send_msg_message(message, status_text, keyboard)
+    await Sendler_msg().sendler_photo_message(message, LOGO, status_text, keyboard)
 
     if old_msg_id:
         try:

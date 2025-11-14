@@ -35,7 +35,7 @@ async def admin_panel(call: types.CallbackQuery):
 
     keyb = Admin_keyb().admin_keyboard(is_manager)
 
-    text_admin = 'Меню настроек'
+    text_admin = 'Панель управления'
 
     await Sendler_msg().sendler_photo_call(call, LOGO, text_admin, keyb)
 

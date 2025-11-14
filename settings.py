@@ -33,8 +33,6 @@ TOKEN = os.getenv('TOKEN')
 
 SQL_URL = os.getenv('SQL_URL')
 
-START_MESSAGE = 'Меню бота'
-
 LOGO = r'src/telegram/media/logo.jpg'
 
 LOGGER = True

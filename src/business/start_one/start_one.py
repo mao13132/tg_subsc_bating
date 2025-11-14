@@ -6,9 +6,10 @@
 # 1.0       2023    Initial Version
 #
 # ---------------------------------------------
-from settings import LOGO, START_MESSAGE, ADMIN
+from settings import LOGO, ADMIN
 from src.business.get_data_user.get_data_user import get_data_user
 from src.business.managers.check_manager import check_manager
+from src.business.text_manager.text_manager import text_manager
 from src.telegram.keyboard.keyboards import Admin_keyb
 
 from src.telegram.sendler.sendler import Sendler_msg
@@ -45,6 +46,8 @@ async def start_one(message: Message, state: FSMContext):
 
     keyb = Admin_keyb().start_keyb(access_admin)
 
-    await Sendler_msg().sendler_photo_message(message, LOGO, START_MESSAGE, keyb)
+    start_message = await text_manager.get_message('welcome')
+
+    await Sendler_msg().sendler_photo_message(message, LOGO, start_message, keyb)
 
     return True
