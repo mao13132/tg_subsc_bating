@@ -12,6 +12,8 @@ class Base(DeclarativeBase):
 class States(StatesGroup):
     add_manager = State()
 
+    add_admin_chat = State()
+
 
 class EditTextState(StatesGroup):
     waiting_new_text = State()
@@ -36,3 +38,9 @@ START_MESSAGE = 'Меню бота'
 LOGO = r'src/telegram/media/logo.jpg'
 
 LOGGER = True
+
+SETTINGS_CHATS = {
+    'analytic_chat': {
+        'name': 'Чат проверка на подписку'
+    },
+}

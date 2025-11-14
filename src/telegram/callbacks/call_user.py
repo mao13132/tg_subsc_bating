@@ -2,6 +2,8 @@ from aiogram import Dispatcher
 from aiogram.dispatcher import FSMContext
 
 from settings import LOGO
+from src.business.chat_admin.add_chat_admin_call_ import add_chat_admin_call
+from src.business.chat_admin.chat_admin_call_ import chat_admin_call
 from src.business.managers.add_managers_call import add_managers_call
 from src.business.managers.check_manager import check_manager
 from src.business.managers.managers_call import managers_call
@@ -53,3 +55,7 @@ def register_callbacks(dp: Dispatcher):
     dp.register_callback_query_handler(text_msg_call, text='text_msg', state='*')
     dp.register_callback_query_handler(edit_text_button_call, text_contains='edit_text_button-', state='*')
     dp.register_callback_query_handler(edit_text_message_call, text_contains='edit_text_message-', state='*')
+
+    dp.register_callback_query_handler(add_chat_admin_call, text_contains='admin_chat-', state='*')
+
+    dp.register_callback_query_handler(chat_admin_call, text='chat_admin_call', state='*')

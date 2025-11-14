@@ -15,6 +15,8 @@ class Admin_keyb:
         if not is_manager:
             self._start_key.add(InlineKeyboardButton(text=f'📎 Менеджеры', callback_data='managers'))
 
+        self._start_key.add(InlineKeyboardButton(text=f'🗂️ Настройка каналов', callback_data='chat_admin_call'))
+
         self._start_key.add(InlineKeyboardButton(text=f'✏️ Текста кнопок', callback_data='text_keyboards'))
 
         self._start_key.add(InlineKeyboardButton(text=f'✏️ Текста сообщений', callback_data='text_msg'))
