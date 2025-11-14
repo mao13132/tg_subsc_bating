@@ -5,6 +5,7 @@ from settings import LOGO
 from src.business.chat_admin.add_chat_admin_call_ import add_chat_admin_call
 from src.business.chat_admin.chat_admin_call_ import chat_admin_call
 from src.business.get_forecast.get_forecast_call_ import get_forecast_call
+from src.business.logo.logo_change_call_ import logo_change_call
 from src.business.managers.add_managers_call import add_managers_call
 from src.business.managers.check_manager import check_manager
 from src.business.managers.managers_call import managers_call
@@ -62,3 +63,5 @@ def register_callbacks(dp: Dispatcher):
     dp.register_callback_query_handler(chat_admin_call, text='chat_admin_call', state='*')
 
     dp.register_callback_query_handler(get_forecast_call, text='get_forecast', state='*')
+
+    dp.register_callback_query_handler(logo_change_call, text='logo_change_call', state='*')

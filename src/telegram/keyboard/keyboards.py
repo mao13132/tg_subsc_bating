@@ -27,6 +27,8 @@ class Admin_keyb:
 
         self._start_key.add(InlineKeyboardButton(text=f'✏️ Текста сообщений', callback_data='text_msg'))
 
+        self._start_key.add(InlineKeyboardButton(text=f'🏞 Логотип к сообщениям', callback_data='logo_change_call'))
+
         self._start_key.add(InlineKeyboardButton(text=f'🔙 Назад', callback_data='over_state'))
 
         return self._start_key

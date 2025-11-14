@@ -16,3 +16,5 @@ async def get_forecast_call(call: types.CallbackQuery, state: FSMContext):
     await Sendler_msg.log_client_call(call)
 
     await state.finish()
+
+    id_user = call.message.chat.id

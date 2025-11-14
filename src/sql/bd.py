@@ -131,14 +131,28 @@ class BotDB:
             return False
 
     async def update_settings(self, key, value):
-
         try:
             async with self.async_session_maker() as session:
-                query = update(Settings).where(Settings.key == str(key)).values(value=value)
-
+                query = select(Settings).where(Settings.key == str(key))
                 response = await session.execute(query)
+                existing_setting = response.scalar_one_or_none()
 
-                result = await session.commit()
+                if existing_setting:
+                    query = update(Settings).where(Settings.key == str(key)).values(value=value)
+
+                    response = await session.execute(query)
+
+                else:
+                    insert_data = {
+                        'key': str(key),
+                        'value': value
+                    }
+
+                    query = insert(Settings).values(**insert_data)
+
+                    await session.execute(query)
+
+                await session.commit()
 
                 return True
         except Exception as es:
