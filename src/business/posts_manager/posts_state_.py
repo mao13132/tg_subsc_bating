@@ -35,12 +35,22 @@ async def posts_state(message: Message, state: FSMContext):
     if not batch_key:
         from datetime import datetime
         batch_key = f'posts_sendler_{id_user}_{int(datetime.now().timestamp())}'
-        await state.update_data(batch_key=batch_key, collect_count=0)
+        await state.update_data(batch_key=batch_key, collect_count=0, mg_counters={})  # сброс счётчиков медиа-групп
+
+    data = await state.get_data()
+    mg_counters = data.get('mg_counters', {})
+    mg_idx = None
+    if mg_id:
+        mg_idx = int(mg_counters.get(str(mg_id), 0)) + 1  # порядок в группе
+        mg_counters[str(mg_id)] = mg_idx
+        await state.update_data(mg_counters=mg_counters)  # сохраняем счётчик в FSM
 
     await BotDB.user_messages.create({
         'id_user': str(id_user),
         'content': payload,
         'batch_key': str(batch_key),
+        'media_group_id': str(mg_id) if mg_id else None,
+        'mg_index': mg_idx,  # индекс сообщения в медиа-группе
     })
 
     data = await state.get_data()

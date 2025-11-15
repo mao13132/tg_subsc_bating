@@ -8,7 +8,7 @@ import json
 from typing import Optional, Dict, List, Tuple
 
 from aiogram import Bot
-from aiogram.types import Message, InlineKeyboardMarkup, ReplyKeyboardMarkup
+from aiogram.types import Message, InlineKeyboardMarkup, ReplyKeyboardMarkup, InputMediaPhoto, InputMediaVideo
 
 
 def _safe_caption(message: Message) -> str:
@@ -100,7 +100,7 @@ def try_parse_json(text: str) -> Optional[Dict]:
 
 def collect_album_items(messages: List) -> Tuple[List[Dict], str]:
     try:
-        messages = sorted(messages, key=lambda m: getattr(m, 'created_at', None) or 0)
+        messages = sorted(messages, key=lambda m: (getattr(m, 'mg_index', None) or 0, getattr(m, 'id_pk', None) or 0))
     except Exception:
         pass
 
@@ -187,3 +187,40 @@ async def send_packed_content(bot: Bot, chat_id: int, packed: str,
     await bot.send_message(chat_id, data.get('text', '') or '', reply_markup=reply_markup)
 
     return True
+
+
+def _to_input_media(items: List[Dict], caption: str) -> List:
+    media = []
+    for i, it in enumerate(items):
+        if it.get('type') == 'photo':
+            media.append(InputMediaPhoto(media=it.get('file_id'), caption=caption if i == 0 and caption else None))
+        elif it.get('type') == 'video':
+            media.append(InputMediaVideo(media=it.get('file_id'), caption=caption if i == 0 and caption else None))
+    return media
+
+
+async def send_media_group_records(bot: Bot, chat_id: int, messages: List) -> bool:
+    items, caption = collect_album_items(messages)
+    media = _to_input_media(items, caption)
+    if media:
+        await bot.send_media_group(chat_id, media)
+        return True
+    return False
+
+
+async def send_records_grouped(bot: Bot, chat_id: int, records: List,
+                               reply_markup: InlineKeyboardMarkup | ReplyKeyboardMarkup | None = None) -> bool:
+    groups: Dict[Optional[str], List] = {}
+    for r in records or []:
+        gid = getattr(r, 'media_group_id', None)
+        groups.setdefault(gid, []).append(r)
+    ok = True
+    for gid, msgs in groups.items():
+        if gid:
+            sent = await send_media_group_records(bot, chat_id, msgs)
+            ok = ok and sent
+        else:
+            for r in msgs:
+                packed = getattr(r, 'content', '') or ''
+                await send_packed_content(bot, chat_id, packed, reply_markup=reply_markup)
+    return ok

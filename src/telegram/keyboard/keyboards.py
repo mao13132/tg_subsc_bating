@@ -52,3 +52,10 @@ class Admin_keyb:
         self._start_key.add(InlineKeyboardButton(text=f'🔙 Назад', callback_data='bet_menu'))
 
         return self._start_key
+
+    def back_main_menu(self, back_text):
+        self._start_key = InlineKeyboardMarkup(row_width=1)
+
+        self._start_key.add(InlineKeyboardButton(text=back_text, callback_data='over_state'))
+
+        return self._start_key

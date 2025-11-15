@@ -20,8 +20,10 @@ class UserMessage(Base):
     """
     Таблица для хранения сообщений пользователя в едином формате:
     - id_user: Telegram ID пользователя
-    - content: JSON-строка, полученная из pack_message_content(message)
-    - batch_key: ключ партии/сессии (чтобы группировать множественные сообщения)
+    - content: JSON-строка из pack_message_content(message)
+    - batch_key: ключ партии/сессии для групповой отправки
+    - media_group_id: идентификатор медиа-группы Telegram (если сообщение часть альбома)
+    - mg_index: порядок сообщения внутри медиа-группы (1..N)
     - created_at/updated_at: аудит
     """
     __tablename__ = 'user_messages'
@@ -33,6 +35,10 @@ class UserMessage(Base):
     content = Column(String, nullable=False, comment="Упакованный JSON контент (text/photo/video/document/animation)")
 
     batch_key = Column(String, nullable=True, index=True, comment="Ключ партии/контекста для группировки")
+
+    media_group_id = Column(String, nullable=True, index=True, comment="ID медиа-группы Telegram")
+
+    mg_index = Column(Integer, nullable=True, comment="Порядковый номер сообщения в медиа-группе")
 
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow, comment="Дата создания")
 
@@ -82,6 +88,24 @@ class UserMessageCRUD:
                 return result.scalars().all()
         except Exception as e:
             logger_msg(f"UserMessageCRUD read_by_filter error: {e}")
+            return []
+
+    async def read_media_group(self, id_user: str, media_group_id: str) -> List[UserMessage]:
+        """Получить все сообщения медиа-группы в правильном порядке."""
+        try:
+            async with self.session_maker() as session:
+                query = (
+                    select(UserMessage)
+                    .where(
+                        UserMessage.id_user == str(id_user),
+                        UserMessage.media_group_id == str(media_group_id)
+                    )
+                    .order_by(UserMessage.mg_index.asc(), UserMessage.id_pk.asc())
+                )
+                result = await session.execute(query)
+                return result.scalars().all()
+        except Exception as e:
+            logger_msg(f"UserMessageCRUD read_media_group error: {e}")
             return []
 
     async def update_by_id(self, msg_id: int, data: Dict[str, Any]) -> bool:

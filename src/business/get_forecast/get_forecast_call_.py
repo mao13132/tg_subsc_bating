@@ -9,9 +9,11 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from settings import LOGO
+from settings import LOGO, ADMIN
 from src.business.channel_subscription.check_subscription import ChannelSubscriptionChecker
+from src.business.get_forecast.send_forecast_ import send_forecast
 from src.business.text_manager.text_manager import text_manager
+from src.telegram.keyboard.keyboards import Admin_keyb
 from src.telegram.sendler.sendler import Sendler_msg
 
 from src.telegram.bot_core import BotDB
@@ -49,7 +51,19 @@ async def get_forecast_call(call: types.CallbackQuery, state: FSMContext):
 
         return False
 
-    await call.answer('Подписан', show_alert=True)
+    back = await text_manager.get_button_text('back')
 
+    keyboard = Admin_keyb().back_main_menu(back)
 
+    forecast_message = await BotDB.user_messages.read_by_filter({})
 
+    if not forecast_message:
+        no_load = await text_manager.get_message('no_load')
+
+        await Sendler_msg().sendler_photo_call(call, LOGO, no_load, keyboard)
+
+        return True
+
+    res_send = await send_forecast({'message': call.message, "messages": forecast_message})
+
+    return True
