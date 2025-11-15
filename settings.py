@@ -29,7 +29,7 @@ load_dotenv(dotenv_path)
 
 DEVELOPER = 1422194909
 
-ADMIN = ['1422194909']
+ADMIN = ['1422194909', '322281327']
 
 TOKEN = os.getenv('TOKEN')
 

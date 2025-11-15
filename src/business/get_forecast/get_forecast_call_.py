@@ -77,4 +77,6 @@ async def get_forecast_call(call: types.CallbackQuery, state: FSMContext):
 
     res_send = await send_forecast({'message': call.message, "messages": forecast_message})
 
+    res_update_user = await BotDB.edit_user('need_paid', True, id_user)
+
     return True

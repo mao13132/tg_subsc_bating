@@ -18,6 +18,8 @@ from src.telegram.bot_core import BotDB
 
 
 async def send_me_bet_call(call: types.CallbackQuery, state: FSMContext):
+    await Sendler_msg.log_client_call(call)
+
     await state.finish()
 
     keyboard = Admin_keyb().back_bets_menu()

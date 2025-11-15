@@ -7,7 +7,7 @@ from src.telegram.bot_core import BotDB
 
 
 class Sendler_msg:
-
+    @staticmethod
     async def _get_logo_file_id():
         try:
             return await BotDB.get_setting('logo_file_id')
@@ -278,13 +278,17 @@ class Sendler_msg:
                 return False
 
     async def new_sendler_photo_call(self, call, photo, text, keyb):
+        logo_file_id = await Sendler_msg._get_logo_file_id()
+
         try:
-            logo_file_id = await Sendler_msg._get_logo_file_id()
             if logo_file_id:
                 await call.message.bot.send_photo(call.message.chat.id, logo_file_id, caption=(text),
                                                   reply_markup=keyb)
                 return True
         except:
+            logo_file_id = False
+
+        if not logo_file_id:
             try:
                 with open(photo, 'rb') as file:
                     await call.message.bot.send_photo(call.message.chat.id, file, caption=(text),

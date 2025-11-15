@@ -12,16 +12,38 @@ from aiogram.types import Message, InlineKeyboardMarkup, ReplyKeyboardMarkup, In
 
 
 def _safe_caption(message: Message) -> str:
-    """
-    Возвращает подпись/текст из сообщения, если есть.
-    Предпочитаем html_text для сохранения форматирования.
-    """
     try:
-        exists_text = (getattr(message, 'html_text', None) or getattr(message, 'caption', None) or '').strip()
-    except:
+        cap = getattr(message, 'caption', None)
+        if cap:
+            try:
+                html_cap = getattr(message, 'html_caption', None)
+                return (html_cap or cap).strip()
+            except Exception:
+                return cap.strip()
+        txt = getattr(message, 'text', None)
+        if txt:
+            try:
+                html_txt = getattr(message, 'html_text', None)
+                return (html_txt or txt).strip()
+            except Exception:
+                return txt.strip()
+        return ''
+    except Exception:
         return ''
 
-    return exists_text
+
+def _safe_text(message: Message) -> str:
+    try:
+        txt = getattr(message, 'text', None)
+        if txt:
+            try:
+                html_txt = getattr(message, 'html_text', None)
+                return (html_txt or txt).strip()
+            except Exception:
+                return (txt or '').strip()
+        return ''
+    except Exception:
+        return ''
 
 
 def pack_message_content(message: Message) -> str:
@@ -72,8 +94,22 @@ def pack_message_content(message: Message) -> str:
             "caption": caption,
         }, ensure_ascii=False)
 
+    if ct == 'voice' and getattr(message, 'voice', None):
+        return json.dumps({
+            "type": "voice",
+            "file_id": message.voice.file_id,
+            "caption": caption,
+        }, ensure_ascii=False)
+
+    if ct == 'audio' and getattr(message, 'audio', None):
+        return json.dumps({
+            "type": "audio",
+            "file_id": message.audio.file_id,
+            "caption": caption,
+        }, ensure_ascii=False)
+
     # TEXT LAST — только если нет медиа
-    text_content = (getattr(message, 'html_text', None) or getattr(message, 'text', None) or '').strip()
+    text_content = _safe_text(message)
     if text_content:
         return json.dumps({
             "type": "text",
@@ -181,6 +217,16 @@ async def send_packed_content(bot: Bot, chat_id: int, packed: str,
     if t == 'animation':
         await bot.send_animation(chat_id, data.get('file_id', ''), caption=data.get('caption') or None,
                                  reply_markup=reply_markup)
+        return True
+
+    if t == 'voice':
+        await bot.send_voice(chat_id, data.get('file_id', ''), caption=data.get('caption') or None,
+                             reply_markup=reply_markup)
+        return True
+
+    if t == 'audio':
+        await bot.send_audio(chat_id, data.get('file_id', ''), caption=data.get('caption') or None,
+                             reply_markup=reply_markup)
         return True
 
     # На всякий случай: неизвестный тип — отправляем как текст
