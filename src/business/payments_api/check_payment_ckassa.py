@@ -101,11 +101,7 @@ class CKassaPaymentChecker:
         return False
 
     async def check_payment(self, shop_token: str, sec_key: str, regPayNum: str):
-        """
-        Основной метод проверки статуса платежа.
-        """
         for attempt in range(5):
-
             data = await self._check_payment(shop_token, sec_key, regPayNum)
 
             if data == '-1':
@@ -119,47 +115,34 @@ class CKassaPaymentChecker:
                 continue
 
             is_err = await self.check_error(data, regPayNum)
-
             if is_err == '-1':
                 logger_msg(f"Попытка {attempt + 1}/5: Лимит/таймаут, ждем 15 сек")
                 await asyncio.sleep(15)
                 continue
-
             if is_err:
-                logger_msg(f"CKassa: Ошибка проверки статуса платежа для regPayNum={regPayNum}")
-                return False
+                return {"kind": "error", "raw": data}
 
-            # --- УСПЕХ ---
             try:
                 state = data.get("state") or data.get("status") or data.get("paymentStatus")
                 norm = str(state).lower() if state is not None else None
                 amount = data.get("amount")
                 created_date = data.get("createdDate") or data.get("created_date")
-                result_obj = data.get("result") if isinstance(data.get("result"), dict) else None
-                res_code = result_obj.get("code") if result_obj else None
-                res_msg = result_obj.get("message") if result_obj else None
 
                 if norm in ("payed", "processed", "holded"):
-                    print(
-                        f'Sтатус платежа regPayNum="{regPayNum}": {state} | amount={amount} | createdDate={created_date} | result.code={res_code} | result.message={res_msg}')
-                    return data
-
-                if norm in ("created", "rejected", "refunded", "error", "created_error"):
-                    logger_msg(
-                        f'CKassa: Негативный статус regPayNum="{regPayNum}": {state} | result.code={res_code} | result.message={res_msg}')
-                    return False
-
-                print(f'Неизвестный статус для regPayNum="{regPayNum}": {state} | данные: {data}')
-                return data
+                    return {"kind": "success", "norm": norm, "amount": amount, "created_date": created_date,
+                            "raw": data}
+                if norm in ("created",):
+                    return {"kind": "pending", "norm": norm, "created_date": created_date, "raw": data}
+                if norm in ("rejected", "refunded", "error", "created_error"):
+                    return {"kind": "negative", "norm": norm, "raw": data}
+                return {"kind": "unknown", "norm": norm, "raw": data}
 
             except Exception as e:
                 logger_msg(f"CKassa: Ошибка структуры ответа проверки: {e}")
-                logger_msg(f"Ответ: {data}")
                 await asyncio.sleep(1)
                 continue
 
-        logger_msg(f"CKassa: Не удалось проверить платёж для regPayNum={regPayNum}")
-        return False
+        return {"kind": "retry", "raw": None}
 
 
 if __name__ == "__main__":

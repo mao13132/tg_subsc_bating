@@ -71,7 +71,8 @@ async def send_payments(settings):
                 'id_user': str(uid),
                 'amount': int(summa),
                 'reg_pay_num': reg_pay_num['regPayNum'],
-                'status': 'sent' if res else 'failed'
+                'status': 'sent' if res else 'failed',
+                'link': link_payment
             })
         except Exception as e:
             logger_msg(f"SQL: ошибка записи платежа для {uid}: {e}")

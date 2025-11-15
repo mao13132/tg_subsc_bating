@@ -19,6 +19,7 @@ class Payments(Base):
     id_user = Column(String, nullable=False, index=True)
     amount = Column(Integer, nullable=False)
     reg_pay_num = Column(String, nullable=True, index=True)
+    link = Column(String, nullable=False, default='created')
     status = Column(String, nullable=False, default='created')
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 

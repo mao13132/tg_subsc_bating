@@ -45,6 +45,10 @@ LOGO = r'src/telegram/media/logo.jpg'
 
 LOGGER = True
 
+MOKE_SCHEDULE_PAYMENTS_TASK = False
+
+CHECK_PAYMENT_EVERY = 30
+
 SETTINGS_CHATS = {
     'analytic_chat': {
         'name': 'Чат проверка на подписку'
