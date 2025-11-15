@@ -9,35 +9,54 @@
 from src.business.text_manager.text_manager import text_manager
 from src.telegram.bot_core import BotDB
 from src.telegram.keyboard.keyboards import Admin_keyb
+from src.business.payments_api.create_payment_ckassa import CKassaPayment
+from src.utils.logger._logger import logger_msg
+from settings import SHOPKEY, SECKEY
 
 
 async def send_payments(settings):
-    summa = settings['summa']
-
+    summa = int(settings['summa'])
+    amount_kop = summa * 100
     message = settings['message']
 
-    payment_link = 'https://google.com'
+    name_shop = await BotDB.get_setting('shop_name') or 'Основной Магазин'
+    service_code = await BotDB.get_setting('ckassa_service_code') or '1000-13864-2'
 
     template = await text_manager.get_message('send_payment')
-
     btn_text = await text_manager.get_button_text('paid')
 
-    # 3) Получаем список пользователей, которым нужно отправить сообщение
-    # users = await BotDB.get_users_need_paid_false() or []
     users = await BotDB.users_read_by_filter(filters={'is_subs': True}) or []
 
     # 4) Рассылка по ID пользователей
     sent, failed = 0, 0
-    for uid in users:
-        client_payment_link = f"{payment_link}?utm_source={uid}"
+    for user in users:
+        uid = user.id_user
 
-        client_message = template.format(summa=summa, link=client_payment_link)
-
-        keyboard = Admin_keyb().payment_keyb(btn_text, client_payment_link)
+        payment_data = {
+            "serviceCode": service_code,
+            "amount": int(amount_kop),
+            "comission": 0,
+            "properties": [
+                {"name": "ЛИЦЕВОЙ_СЧЕТ", "value": str(uid)}
+            ]
+        }
 
         try:
-            res = await message.bot.send_message(int(uid), client_message, reply_markup=keyboard)
+            reg_pay_num = await CKassaPayment(payment_data).create_payment(name_shop, SHOPKEY, SECKEY)
 
+            link_payment = reg_pay_num['payUrl']
+        except Exception as e:
+            logger_msg(f"CKassa: ошибка создания платежа для {uid}: {e}")
+
+            continue
+
+        keyboard = Admin_keyb().payment_keyb(btn_text, link_payment)
+
+        client_message = template.format(summa=summa, link=f"<a href='{link_payment}'>Оплатить</a>")
+
+        try:
+            res = await message.bot.send_message(int(uid), client_message, reply_markup=keyboard,
+                                                 disable_web_page_preview=True)
             await message.bot.pin_chat_message(chat_id=int(uid), message_id=res['message_id'])
         except:
             res = False
@@ -46,6 +65,16 @@ async def send_payments(settings):
             sent += 1
         else:
             failed += 1
+
+        try:
+            await BotDB.payments.create({
+                'id_user': str(uid),
+                'amount': int(summa),
+                'reg_pay_num': reg_pay_num['regPayNum'],
+                'status': 'sent' if res else 'failed'
+            })
+        except Exception as e:
+            logger_msg(f"SQL: ошибка записи платежа для {uid}: {e}")
 
         continue
 

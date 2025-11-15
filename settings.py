@@ -33,6 +33,10 @@ ADMIN = ['1422194909', '322281327']
 
 TOKEN = os.getenv('TOKEN')
 
+SHOPKEY = os.getenv('SHOPKEY')
+
+SECKEY = os.getenv('SECKEY')
+
 SQL_URL = os.getenv('SQL_URL')
 
 LOGO = r'src/telegram/media/logo.jpg'

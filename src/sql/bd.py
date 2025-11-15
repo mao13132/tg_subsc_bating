@@ -15,6 +15,7 @@ from sqlalchemy.orm import sessionmaker
 from settings import SQL_URL, Base
 from src.sql.texts import TextsCRUD
 from src.sql.user_messages import UserMessageCRUD
+from src.sql.payments import PaymentsCRUD
 from src.utils.logger._logger import logger_msg
 from src.utils.telegram_debug import SendlerOneCreate
 
@@ -78,6 +79,9 @@ class BotDB:
 
             # Инициализируем CRUD для пользовательских сообщений (упакованный контент)
             self.user_messages = UserMessageCRUD(self.async_session_maker)
+
+            # Инициализируем CRUD для платежей
+            self.payments = PaymentsCRUD(self.async_session_maker)
         except Exception as es:
             error_ = f'SQL не могу создать подключение "{es}"'
 
