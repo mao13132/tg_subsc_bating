@@ -205,6 +205,18 @@ class BotDB:
             logger_msg(error_)
             return False
 
+    async def bulk_set_need_paid_true(self):
+        try:
+            async with self.async_session_maker() as session:
+                query = update(Users).where(Users.need_paid == False).values(need_paid=True)
+                await session.execute(query)
+                await session.commit()
+                return True
+        except Exception as es:
+            error_ = f'SQL bulk_set_need_paid_true: "{es}"'
+            logger_msg(error_)
+            return False
+
     async def init_bases(self):
         try:
             async with self.engine.begin() as conn:
@@ -219,5 +231,23 @@ class BotDB:
             logger_msg(error_)
 
             await SendlerOneCreate().send_message(error_)
+
+            return False
+
+    async def get_user_bu_id_user(self, id_user):
+
+        try:
+            async with self.async_session_maker() as session:
+                query = select(Users).where(Users.id_user == str(id_user))
+
+                response = await session.execute(query)
+
+                result = response.scalars().first()
+
+                return result
+        except Exception as es:
+            error_ = f'SQL get_user_bu_id_user: "{es}"'
+
+            logger_msg(error_)
 
             return False

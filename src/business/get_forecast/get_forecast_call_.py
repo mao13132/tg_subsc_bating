@@ -23,7 +23,7 @@ CHANNEL_KEY = 'analytic_chat'
 
 
 async def get_forecast_call(call: types.CallbackQuery, state: FSMContext):
-    # await Sendler_msg.log_client_call(call)
+    await Sendler_msg.log_client_call(call)
 
     await state.finish()
 
@@ -52,6 +52,17 @@ async def get_forecast_call(call: types.CallbackQuery, state: FSMContext):
         return False
 
     back = await text_manager.get_button_text('back')
+
+    user_data = await BotDB.get_user_bu_id_user(id_user)
+
+    if user_data.need_paid:
+        no_paid_msg = await text_manager.get_message('no_paid_msg')
+
+        keyboard = Admin_keyb().back_main_menu(back)
+
+        await Sendler_msg().sendler_photo_call(call, LOGO, no_paid_msg, keyboard)
+
+        return False
 
     keyboard = Admin_keyb().back_main_menu(back)
 
