@@ -51,6 +51,8 @@ async def get_forecast_call(call: types.CallbackQuery, state: FSMContext):
 
         return False
 
+    update_user = await BotDB.edit_user('is_subs', True, id_user)
+
     back = await text_manager.get_button_text('back')
 
     user_data = await BotDB.get_user_bu_id_user(id_user)

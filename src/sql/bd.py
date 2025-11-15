@@ -40,6 +40,8 @@ class Users(Base):
 
     need_paid = Column(Boolean, nullable=False, default=False)
 
+    is_subs = Column(Boolean, nullable=False, default=False)
+
     other = Column(String, nullable=True)
 
 
@@ -196,7 +198,7 @@ class BotDB:
     async def get_users_need_paid_false(self):
         try:
             async with self.async_session_maker() as session:
-                query = select(Users.id_user).where(Users.need_paid == False)
+                query = select(Users.id_user).where(Users.need_paid == False, Users.is_subs == True)
                 response = await session.execute(query)
                 result = [row[0] for row in response.all()] if response else []
                 return result
@@ -228,6 +230,18 @@ class BotDB:
             error_ = f'SQL get_all_users: "{es}"'
             logger_msg(error_)
             return False
+
+    async def users_read_by_filter(self, filters):
+        try:
+            async with self.async_session_maker() as session:
+                query = select(Users).filter_by(**filters)
+                result = await session.execute(query)
+                return result.scalars().all()
+
+        except Exception as e:
+            error_msg = f"TextsCRUD users_read_by_filter error: {e}"
+            logger_msg(error_msg)
+            return []
 
     async def init_bases(self):
         try:

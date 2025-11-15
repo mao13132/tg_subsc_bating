@@ -24,7 +24,7 @@ async def send_payments(settings):
 
     # 3) Получаем список пользователей, которым нужно отправить сообщение
     # users = await BotDB.get_users_need_paid_false() or []
-    users = await BotDB.get_all_users() or []
+    users = await BotDB.users_read_by_filter(filters={'is_subs': True}) or []
 
     # 4) Рассылка по ID пользователей
     sent, failed = 0, 0
