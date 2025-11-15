@@ -9,10 +9,13 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
+from settings import LOGO
 from src.business.channel_subscription.check_subscription import ChannelSubscriptionChecker
+from src.business.text_manager.text_manager import text_manager
 from src.telegram.sendler.sendler import Sendler_msg
 
 from src.telegram.bot_core import BotDB
+from src.utils.logger._logger import logger_msg
 
 CHANNEL_KEY = 'analytic_chat'
 
@@ -38,6 +41,12 @@ async def get_forecast_call(call: types.CallbackQuery, state: FSMContext):
     is_subscription = await subscription_checker.is_user_subscribed(id_user)
 
     if not is_subscription:
+        error_ = await text_manager.get_message('no_subs')
+
+        await Sendler_msg().sendler_photo_call(call, LOGO, error_, None)
+
+        logger_msg(f'Пользователь {call.message.chat.id} без подписки, нажимал кнопку "Получить прогноз"')
+
         return False
 
     await call.answer('Подписан', show_alert=True)

@@ -2,6 +2,8 @@ from aiogram import Dispatcher
 from aiogram.dispatcher import FSMContext
 
 from settings import LOGO
+from src.business.bet_menu.bet_menu_call_ import bet_menu_call
+from src.business.bet_menu.set_bet.set_bet_call_ import set_bet_call
 from src.business.chat_admin.add_chat_admin_call_ import add_chat_admin_call
 from src.business.chat_admin.chat_admin_call_ import chat_admin_call
 from src.business.get_forecast.get_forecast_call_ import get_forecast_call
@@ -9,6 +11,7 @@ from src.business.logo.logo_change_call_ import logo_change_call
 from src.business.managers.add_managers_call import add_managers_call
 from src.business.managers.check_manager import check_manager
 from src.business.managers.managers_call import managers_call
+from src.business.posts_manager.finish_get_posts_call_ import finish_get_posts_call
 from src.business.start_one.start_one import start_one
 from src.business.text_edit.edit_text_call import edit_text_button_call, edit_text_message_call
 from src.business.text_edit.text_keyboards_call import text_keyboards_call
@@ -65,3 +68,9 @@ def register_callbacks(dp: Dispatcher):
     dp.register_callback_query_handler(get_forecast_call, text='get_forecast', state='*')
 
     dp.register_callback_query_handler(logo_change_call, text='logo_change_call', state='*')
+
+    dp.register_callback_query_handler(bet_menu_call, text='bet_menu', state='*')
+
+    dp.register_callback_query_handler(set_bet_call, text='set_bet', state='*')
+
+    dp.register_callback_query_handler(finish_get_posts_call, text='send_user_messages', state='*')
