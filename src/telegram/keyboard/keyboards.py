@@ -42,6 +42,8 @@ class Admin_keyb:
 
         self._start_key.add(InlineKeyboardButton(text=f'🗑 Очистить прогноз', callback_data='clear_bet'))
 
+        self._start_key.add(InlineKeyboardButton(text=f'🗞 Прислать мне', callback_data='send_me_bet'))
+
         self._start_key.add(InlineKeyboardButton(text=f'🔙 Назад', callback_data='admin_panel'))
 
         return self._start_key

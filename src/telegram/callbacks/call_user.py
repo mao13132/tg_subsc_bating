@@ -4,6 +4,7 @@ from aiogram.dispatcher import FSMContext
 from settings import LOGO
 from src.business.bet_menu.bet_menu_call_ import bet_menu_call
 from src.business.bet_menu.clear_bet.clear_bet_call_ import clear_bet_call
+from src.business.bet_menu.send_me_bet.send_me_bet_call_ import send_me_bet_call
 from src.business.bet_menu.set_bet.set_bet_call_ import set_bet_call
 from src.business.chat_admin.add_chat_admin_call_ import add_chat_admin_call
 from src.business.chat_admin.chat_admin_call_ import chat_admin_call
@@ -77,3 +78,5 @@ def register_callbacks(dp: Dispatcher):
     dp.register_callback_query_handler(finish_get_posts_call, text='send_user_messages', state='*')
 
     dp.register_callback_query_handler(clear_bet_call, text='clear_bet', state='*')
+
+    dp.register_callback_query_handler(send_me_bet_call, text='send_me_bet', state='*')
