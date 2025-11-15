@@ -46,6 +46,8 @@ class Admin_keyb:
 
         self._start_key.add(InlineKeyboardButton(text=f'✅ Выслать счета', callback_data='send_payments'))
 
+        self._start_key.add(InlineKeyboardButton(text=f'✅ Разослать прогноз', callback_data='send_forecast'))
+
         self._start_key.add(InlineKeyboardButton(text=f'🔙 Назад', callback_data='admin_panel'))
 
         return self._start_key
@@ -77,5 +79,14 @@ class Admin_keyb:
         self._start_key = InlineKeyboardMarkup(row_width=1)
 
         self._start_key.add(InlineKeyboardButton(text=btn_text, url=client_payment_link))
+
+        return self._start_key
+
+    def approve_send_forecast(self):
+        self._start_key = InlineKeyboardMarkup(row_width=1)
+
+        self._start_key.add(InlineKeyboardButton(text=f'✅ Подтверждаю', callback_data='approve_forecast'))
+
+        self._start_key.add(InlineKeyboardButton(text=f'🔙 Назад', callback_data='bet_menu'))
 
         return self._start_key

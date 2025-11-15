@@ -217,6 +217,18 @@ class BotDB:
             logger_msg(error_)
             return False
 
+    async def get_all_users(self):
+        try:
+            async with self.async_session_maker() as session:
+                query = select(Users.id_user)
+                response = await session.execute(query)
+                result = [row[0] for row in response.all()] if response else []
+                return result
+        except Exception as es:
+            error_ = f'SQL get_all_users: "{es}"'
+            logger_msg(error_)
+            return False
+
     async def init_bases(self):
         try:
             async with self.engine.begin() as conn:

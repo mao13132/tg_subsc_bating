@@ -23,7 +23,8 @@ async def send_payments(settings):
     btn_text = await text_manager.get_button_text('paid')
 
     # 3) Получаем список пользователей, которым нужно отправить сообщение
-    users = await BotDB.get_users_need_paid_false() or []
+    # users = await BotDB.get_users_need_paid_false() or []
+    users = await BotDB.get_all_users() or []
 
     # 4) Рассылка по ID пользователей
     sent, failed = 0, 0
