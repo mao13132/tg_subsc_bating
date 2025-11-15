@@ -14,6 +14,7 @@ from src.business.managers.add_managers_call import add_managers_call
 from src.business.managers.check_manager import check_manager
 from src.business.managers.managers_call import managers_call
 from src.business.posts_manager.finish_get_posts_call_ import finish_get_posts_call
+from src.business.send_payments.approve_summa_call_ import approve_summa_call
 from src.business.send_payments.send_payments_call_ import send_payments_call
 from src.business.start_one.start_one import start_one
 from src.business.text_edit.edit_text_call import edit_text_button_call, edit_text_message_call
@@ -83,3 +84,5 @@ def register_callbacks(dp: Dispatcher):
     dp.register_callback_query_handler(send_me_bet_call, text='send_me_bet', state='*')
 
     dp.register_callback_query_handler(send_payments_call, text='send_payments', state='*')
+
+    dp.register_callback_query_handler(approve_summa_call, text='approve_summa', state='*')

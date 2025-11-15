@@ -10,6 +10,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import Message
 
 from settings import LOGO
+from src.business.send_payments._send_payments import send_payments
 from src.telegram.keyboard.keyboards import Admin_keyb
 from src.telegram.sendler.sendler import Sendler_msg
 
@@ -28,13 +29,13 @@ async def send_payments_state(message: Message, state: FSMContext):
 
         return False
 
-    text = f'⚠️ Подтверждаете действие?\n\nВы ввели сумму: <b>{summa}</b>\n\n' \
-           f'Если сумма не верная, то пришлите ещё раз'
+    await state.finish()
 
-    keyboard = Admin_keyb().approve_send_summa()
+    res_send = await send_payments({"message": message, "summa": summa})
 
-    await message.reply(text, reply_markup=keyboard)
+    _msg = f'✅ Рассылка выполнена\nСумма: {summa}\nПользователей: {res_send["sent"]}\n' \
+           f'Успешных доставок:{res_send["total"]}\nОшибки: {res_send["failed"]}'
 
-    await state.update_data(summa=summa)
+    await Sendler_msg().sendler_photo_message(message, LOGO, _msg, keyboard)
 
     return True

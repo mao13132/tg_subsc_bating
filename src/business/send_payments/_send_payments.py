@@ -36,6 +36,8 @@ async def send_payments(settings):
 
         try:
             res = await message.bot.send_message(int(uid), client_message, reply_markup=keyboard)
+
+            await message.bot.pin_chat_message(chat_id=int(uid), message_id=res['message_id'])
         except:
             res = False
 
