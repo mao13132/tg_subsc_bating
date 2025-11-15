@@ -14,6 +14,8 @@ class States(StatesGroup):
 
     add_admin_chat = State()
 
+    write_summa = State()
+
 
 class EditTextState(StatesGroup):
     waiting_new_text = State()

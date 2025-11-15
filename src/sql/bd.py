@@ -38,6 +38,8 @@ class Users(Base):
 
     last_time = Column(DateTime, nullable=True)
 
+    need_paid = Column(Boolean, nullable=False, default=False)
+
     other = Column(String, nullable=True)
 
 
@@ -189,6 +191,18 @@ class BotDB:
 
             logger_msg(error_)
 
+            return False
+
+    async def get_users_need_paid_false(self):
+        try:
+            async with self.async_session_maker() as session:
+                query = select(Users.id_user).where(Users.need_paid == False)
+                response = await session.execute(query)
+                result = [row[0] for row in response.all()] if response else []
+                return result
+        except Exception as es:
+            error_ = f'SQL get_users_need_paid_false: "{es}"'
+            logger_msg(error_)
             return False
 
     async def init_bases(self):

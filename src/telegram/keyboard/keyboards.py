@@ -44,6 +44,8 @@ class Admin_keyb:
 
         self._start_key.add(InlineKeyboardButton(text=f'🗞 Прислать мне', callback_data='send_me_bet'))
 
+        self._start_key.add(InlineKeyboardButton(text=f'✅ Выслать счета', callback_data='send_payments'))
+
         self._start_key.add(InlineKeyboardButton(text=f'🔙 Назад', callback_data='admin_panel'))
 
         return self._start_key
@@ -59,5 +61,12 @@ class Admin_keyb:
         self._start_key = InlineKeyboardMarkup(row_width=1)
 
         self._start_key.add(InlineKeyboardButton(text=back_text, callback_data='over_state'))
+
+        return self._start_key
+
+    def payment_keyb(self, btn_text, client_payment_link):
+        self._start_key = InlineKeyboardMarkup(row_width=1)
+
+        self._start_key.add(InlineKeyboardButton(text=btn_text, url=client_payment_link))
 
         return self._start_key

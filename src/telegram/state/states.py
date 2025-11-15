@@ -7,6 +7,7 @@ from src.business.chat_admin.add_chat_admin_state_ import add_chat_admin_state
 from src.business.managers.add_manager_state import add_manager_state
 from src.business.posts_manager.posts_state_ import posts_state
 from src.business.posts_manager.posts_states import PostsStates
+from src.business.send_payments.send_payments_state_ import send_payments_state
 from src.business.text_edit.edit_text_handler import handle_new_text
 
 
@@ -16,6 +17,8 @@ def register_state(dp: Dispatcher):
     dp.register_message_handler(handle_new_text, state=EditTextState.waiting_new_text, content_types=['text'])
 
     dp.register_message_handler(add_chat_admin_state, state=States.add_admin_chat)
+
+    dp.register_message_handler(send_payments_state, state=States.write_summa)
 
     dp.register_message_handler(change_logo_state, state=EditLogoStates.chane_logo, content_types=['photo'])
 
