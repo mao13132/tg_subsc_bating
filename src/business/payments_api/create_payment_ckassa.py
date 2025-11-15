@@ -1,10 +1,8 @@
 # ---------------------------------------------
 # CKassa Payment Create (Shop API)
-# Adapted by ChatGPT
 # ---------------------------------------------
 
 import asyncio
-import os
 import httpx
 import backoff
 

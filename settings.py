@@ -37,6 +37,8 @@ SHOPKEY = os.getenv('SHOPKEY')
 
 SECKEY = os.getenv('SECKEY')
 
+DOMAIN_PAYMENT = os.getenv('DOMAIN_PAYMENT')
+
 SQL_URL = os.getenv('SQL_URL')
 
 LOGO = r'src/telegram/media/logo.jpg'

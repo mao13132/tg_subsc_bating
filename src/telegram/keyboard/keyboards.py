@@ -59,6 +59,13 @@ class Admin_keyb:
 
         return self._start_key
 
+    def wait_keyb(self):
+        self._start_key = InlineKeyboardMarkup(row_width=1)
+
+        self._start_key.add(InlineKeyboardButton(text=f'⏳ Идёт создание и рассылка платежей', callback_data='wait'))
+
+        return self._start_key
+
     def approve_send_summa(self):
         self._start_key = InlineKeyboardMarkup(row_width=1)
 

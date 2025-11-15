@@ -34,6 +34,11 @@ async def approve_summa_call(call: types.CallbackQuery, state: FSMContext):
 
     await state.finish()
 
+    try:
+        await call.message.edit_reply_markup(reply_markup=Admin_keyb().wait_keyb())
+    except:
+        pass
+
     res_send = await send_payments({"message": call.message, "summa": summa})
 
     await BotDB.bulk_set_need_paid_true()
