@@ -19,8 +19,8 @@ async def send_payments(settings):
     amount_kop = summa * 100
     message = settings['message']
 
-    name_shop = await BotDB.get_setting('shop_name') or 'Основной Магазин'
-    service_code = await BotDB.get_setting('ckassa_service_code') or '1000-13864-2'
+    name_shop = 'Основной Магазин'
+    service_code = '1000-13864-2'
 
     template = await text_manager.get_message('send_payment')
     btn_text = await text_manager.get_button_text('paid')

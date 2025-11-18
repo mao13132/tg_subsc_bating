@@ -59,6 +59,11 @@ async def check_payments_once() -> int:
             if isinstance(result, dict):
                 kind = result.get('kind')
                 norm = result.get('norm')
+                raw = result.get('raw')
+
+                if norm is None and isinstance(raw, dict):
+                    state = raw.get('state') or raw.get('status') or raw.get('paymentStatus')
+                    norm = str(state).lower() if state is not None else None
 
                 if kind == 'success' and norm in ("payed", "processed", "holded"):
                     await BotDB.payments.update_by_id(pid, {'status': norm})
@@ -76,6 +81,10 @@ async def check_payments_once() -> int:
                     continue
 
                 if kind == 'negative' and norm in ("rejected", "refunded", "error", "created_error"):
+                    await BotDB.payments.delete_by_filter({'id_pk': pid})
+                    continue
+
+                if kind == 'error':
                     await BotDB.payments.delete_by_filter({'id_pk': pid})
                     continue
 
