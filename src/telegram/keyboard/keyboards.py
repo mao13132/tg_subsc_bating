@@ -46,7 +46,9 @@ class Admin_keyb:
 
         self._start_key.add(InlineKeyboardButton(text=f'✅ Выслать счета', callback_data='send_payments'))
 
-        self._start_key.add(InlineKeyboardButton(text=f'✅ Разослать прогноз', callback_data='send_forecast'))
+        self._start_key.add(InlineKeyboardButton(text=f'✅ Разослать прогноз?', callback_data='send_forecast'))
+
+        self._start_key.add(InlineKeyboardButton(text=f'♻️ Повторить предложения', callback_data='repid_payments'))
 
         self._start_key.add(InlineKeyboardButton(text=f'🔙 Назад', callback_data='admin_panel'))
 

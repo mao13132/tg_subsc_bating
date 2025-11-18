@@ -81,16 +81,16 @@ async def check_payments_once() -> int:
                     continue
 
                 if kind == 'negative' and norm in ("rejected", "refunded", "error", "created_error"):
-                    await BotDB.payments.delete_by_filter({'id_pk': pid})
+                    await BotDB.payments.update_by_id(pid, {'status': norm})
                     continue
 
                 if kind == 'error':
-                    await BotDB.payments.delete_by_filter({'id_pk': pid})
+                    await BotDB.payments.update_by_id(pid, {'status': 'error'})
                     continue
 
                 if kind == 'pending' and norm == 'created':
                     if created_at and (datetime.utcnow() - created_at).total_seconds() > ttl_seconds:
-                        await BotDB.payments.delete_by_filter({'id_pk': pid})
+                        await BotDB.payments.update_by_id(pid, {'status': 'expired'})
                     continue
 
                 if kind == 'unknown':

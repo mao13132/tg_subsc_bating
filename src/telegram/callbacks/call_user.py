@@ -14,6 +14,7 @@ from src.business.managers.add_managers_call import add_managers_call
 from src.business.managers.check_manager import check_manager
 from src.business.managers.managers_call import managers_call
 from src.business.posts_manager.finish_get_posts_call_ import finish_get_posts_call
+from src.business.repid_payments.repid_payments_call_ import repid_payments_call
 from src.business.send_forecast.approve_forecast_call_ import approve_forecast_call
 from src.business.send_forecast.send_forecast_call_ import send_forecast_call
 from src.business.send_payments.approve_summa_call_ import approve_summa_call
@@ -92,3 +93,5 @@ def register_callbacks(dp: Dispatcher):
     dp.register_callback_query_handler(send_forecast_call, text='send_forecast', state='*')
 
     dp.register_callback_query_handler(approve_forecast_call, text='approve_forecast', state='*')
+
+    dp.register_callback_query_handler(repid_payments_call, text='repid_payments', state='*')
