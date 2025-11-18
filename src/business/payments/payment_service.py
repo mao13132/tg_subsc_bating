@@ -49,3 +49,30 @@ async def record_payment(uid: str, amount_rub: int, reg_pay_num: str, link: str,
     except Exception as e:
         logger_msg(f"SQL: ошибка записи платежа для {uid}: {e}")
         return None
+
+
+BAD_STATUSES = (
+    'expired', 'error', 'created_error', 'rejected', 'refunded', 'unknown'
+)
+
+
+def is_payment_bad(payment) -> bool:
+    status = getattr(payment, 'status', '')
+    link = getattr(payment, 'link', '') or ''
+    return (status in BAD_STATUSES) or (link == 'bad')
+
+
+async def ensure_payment_link(uid: str) -> Dict[str, Optional[str]]:
+    latest = await BotDB.payments.read_latest_by_user(str(uid))
+    if not latest:
+        return {'link': None, 'amount': None, 'recreated': False, 'status': None}
+
+    link = getattr(latest, 'link', '') or ''
+    amount = int(getattr(latest, 'amount', 0) or 0)
+
+    if is_payment_bad(latest):
+        created = await create_ckassa_payment(str(uid), amount)
+        await record_payment(str(uid), amount, created['regPayNum'], created['payUrl'], 'created')
+        return {'link': created['payUrl'], 'amount': amount, 'recreated': True, 'status': 'created'}
+
+    return {'link': link, 'amount': amount, 'recreated': False, 'status': getattr(latest, 'status', None)}

@@ -15,7 +15,7 @@ from src.telegram.bot_core import BotDB
 from src.telegram.keyboard.keyboards import Admin_keyb
 from src.utils.logger._logger import logger_msg
 from settings import LOGO
-from src.business.payments.payment_service import create_ckassa_payment, record_payment
+from src.business.payments.payment_service import create_ckassa_payment, record_payment, is_payment_bad
 
 
 async def repid_payments_call(call: types.CallbackQuery, state: FSMContext):
@@ -41,8 +41,7 @@ async def repid_payments_call(call: types.CallbackQuery, state: FSMContext):
             no_payment += 1
             continue
         link = latest.link or ''
-        _bad_statuses = ('expired', 'error', 'created_error', 'rejected', 'refunded', 'unknown')
-        need_recreate = (getattr(latest, 'status', '') in _bad_statuses) or (link == 'bad')
+        need_recreate = is_payment_bad(latest)
         invalid_link = link in ('', 'created')
 
         new_reg = None
