@@ -10,6 +10,8 @@ from typing import Optional, Dict, List, Tuple
 from aiogram import Bot
 from aiogram.types import Message, InlineKeyboardMarkup, ReplyKeyboardMarkup, InputMediaPhoto, InputMediaVideo
 
+from src.utils.logger._logger import logger_msg
+
 
 def _safe_caption(message: Message) -> str:
     try:
@@ -263,10 +265,25 @@ async def send_records_grouped(bot: Bot, chat_id: int, records: List,
     ok = True
     for gid, msgs in groups.items():
         if gid:
-            sent = await send_media_group_records(bot, chat_id, msgs)
+            try:
+                sent = await send_media_group_records(bot, chat_id, msgs)
+            except Exception as es:
+                error_ = f'{chat_id} не смог отправить сообщение mediaGroup "{es}"'
+
+                logger_msg(error_)
+
+                sent = False
+
             ok = ok and sent
         else:
             for r in msgs:
                 packed = getattr(r, 'content', '') or ''
-                await send_packed_content(bot, chat_id, packed, reply_markup=reply_markup)
+                try:
+                    ok = await send_packed_content(bot, chat_id, packed, reply_markup=reply_markup)
+                except Exception as es:
+                    error_ = f'{chat_id} не смог отправить сообщение "{es}"'
+
+                    logger_msg(error_)
+
+                    ok = False
     return ok
