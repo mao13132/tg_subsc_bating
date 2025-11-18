@@ -49,6 +49,21 @@ class PaymentsCRUD:
             logger_msg(f"PaymentsCRUD read_by_filter error: {e}")
             return []
 
+    async def read_latest_by_user(self, id_user: str) -> Optional[Payments]:
+        try:
+            async with self.session_maker() as session:
+                q = (
+                    select(Payments)
+                    .where(Payments.id_user == str(id_user))
+                    .order_by(Payments.created_at.desc())
+                    .limit(1)
+                )
+                res = await session.execute(q)
+                return res.scalars().first()
+        except Exception as e:
+            logger_msg(f"PaymentsCRUD read_latest_by_user error: {e}")
+            return None
+
     async def update_by_id(self, payment_id: int, data: Dict[str, Any]) -> bool:
         try:
             async with self.session_maker() as session:

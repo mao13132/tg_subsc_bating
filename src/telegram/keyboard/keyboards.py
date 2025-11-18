@@ -82,6 +82,16 @@ class Admin_keyb:
 
         return self._start_key
 
+    def no_paid(self, back_text, pay_text=None, client_payment_link=None):
+        self._start_key = InlineKeyboardMarkup(row_width=1)
+
+        if pay_text and client_payment_link:
+            self._start_key.add(InlineKeyboardButton(text=pay_text, url=client_payment_link))
+
+        self._start_key.add(InlineKeyboardButton(text=back_text, callback_data='over_state'))
+
+        return self._start_key
+
     def payment_keyb(self, btn_text, client_payment_link):
         self._start_key = InlineKeyboardMarkup(row_width=1)
 

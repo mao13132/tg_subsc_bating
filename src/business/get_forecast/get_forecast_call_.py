@@ -58,9 +58,17 @@ async def get_forecast_call(call: types.CallbackQuery, state: FSMContext):
     user_data = await BotDB.get_user_bu_id_user(id_user)
 
     if user_data.need_paid:
+        payment = await BotDB.payments.read_latest_by_user(str(id_user))
+        link = getattr(payment, 'link', None) if payment else None
+        summa = getattr(payment, 'amount', None) if payment else None
+
         no_paid_msg = await text_manager.get_message('no_paid_msg')
 
-        keyboard = Admin_keyb().back_main_menu(back)
+        no_paid_msg = no_paid_msg.format(summa=summa, link=link)
+
+        paid_text = await text_manager.get_button_text('paid')
+
+        keyboard = Admin_keyb().no_paid(back, paid_text, link)
 
         await Sendler_msg().sendler_photo_call(call, LOGO, no_paid_msg, keyboard)
 
