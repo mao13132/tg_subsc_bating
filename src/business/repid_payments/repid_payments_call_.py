@@ -15,6 +15,7 @@ from src.telegram.bot_core import BotDB
 from src.telegram.keyboard.keyboards import Admin_keyb
 from src.utils.logger._logger import logger_msg
 from settings import LOGO
+from src.business.payments.payment_service import create_ckassa_payment, record_payment
 
 
 async def repid_payments_call(call: types.CallbackQuery, state: FSMContext):
@@ -40,11 +41,29 @@ async def repid_payments_call(call: types.CallbackQuery, state: FSMContext):
             no_payment += 1
             continue
         link = latest.link or ''
-        if link in ('', 'bad', 'created'):
-            no_link += 1
-            continue
+        _bad_statuses = ('expired', 'error', 'created_error', 'rejected', 'refunded', 'unknown')
+        need_recreate = (getattr(latest, 'status', '') in _bad_statuses) or (link == 'bad')
+        invalid_link = link in ('', 'created')
+
+        new_reg = None
+        if need_recreate:
+            try:
+                name_shop = 'Основной Магазин'
+                service_code = '1000-13864-2'
+                created = await create_ckassa_payment(uid, int(latest.amount), service_code=service_code, name_shop=name_shop)
+                link = created['payUrl']
+                new_reg = created['regPayNum']
+            except Exception as e:
+                logger_msg(f"Resend payments: recreate error for {uid}: {e}")
+                no_link += 1
+                continue
+        else:
+            if invalid_link:
+                no_link += 1
+                continue
+
         keyboard = Admin_keyb().payment_keyb(btn_text, link)
-        client_message = template.format(summa=latest.amount, link=f"<a href='{link}'>Оплатить</a>")
+        client_message = template.format(summa=latest.amount, link=link)
         try:
             res = await call.message.bot.send_message(int(uid), client_message, reply_markup=keyboard,
                                                       disable_web_page_preview=True, protect_content=True)
@@ -56,18 +75,19 @@ async def repid_payments_call(call: types.CallbackQuery, state: FSMContext):
             logger_msg(f"Resend payments: send error for {uid}: {e}")
             res = False
 
+        status = 'resent' if res else 'resent_failed'
         if res:
             sent += 1
-            try:
-                await BotDB.payments.update_by_id(latest.id_pk, {'status': 'resent'})
-            except Exception as e:
-                logger_msg(f"Payments status update error for {uid}: {e}")
         else:
             failed += 1
+
+        if need_recreate and new_reg:
+            await record_payment(uid, int(latest.amount), new_reg, link, status)
+        else:
             try:
-                await BotDB.payments.update_by_id(latest.id_pk, {'status': 'resent_failed'})
+                await BotDB.payments.update_by_id(latest.id_pk, {'status': status})
             except Exception as e:
-                logger_msg(f"Payments status update error for {uid} (failed): {e}")
+                logger_msg(f"Payments status update error for {uid}: {e}")
 
     keyboard = Admin_keyb().bet_keyboard()
     _msg = (

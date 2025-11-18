@@ -9,14 +9,12 @@
 from src.business.text_manager.text_manager import text_manager
 from src.telegram.bot_core import BotDB
 from src.telegram.keyboard.keyboards import Admin_keyb
-from src.business.payments_api.create_payment_ckassa import CKassaPayment
 from src.utils.logger._logger import logger_msg
-from settings import SHOPKEY, SECKEY
+from src.business.payments.payment_service import create_ckassa_payment, record_payment
 
 
 async def send_payments(settings):
     summa = int(settings['summa'])
-    amount_kop = summa * 100
     message = settings['message']
 
     name_shop = 'Основной Магазин'
@@ -32,22 +30,11 @@ async def send_payments(settings):
     for user in users:
         uid = user.id_user
 
-        payment_data = {
-            "serviceCode": service_code,
-            "amount": int(amount_kop),
-            "comission": 0,
-            "properties": [
-                {"name": "ЛИЦЕВОЙ_СЧЕТ", "value": str(uid)}
-            ]
-        }
-
         try:
-            reg_pay_num = await CKassaPayment(payment_data).create_payment(name_shop, SHOPKEY, SECKEY)
-
-            link_payment = reg_pay_num['payUrl']
-        except Exception as e:
-            logger_msg(f"CKassa: ошибка создания платежа для {uid}: {e}")
-
+            created = await create_ckassa_payment(uid, summa, service_code=service_code, name_shop=name_shop)
+            link_payment = created['payUrl']
+            reg_pay_num = created['regPayNum']
+        except Exception:
             continue
 
         keyboard = Admin_keyb().payment_keyb(btn_text, link_payment)
@@ -66,16 +53,7 @@ async def send_payments(settings):
         else:
             failed += 1
 
-        try:
-            await BotDB.payments.create({
-                'id_user': str(uid),
-                'amount': int(summa),
-                'reg_pay_num': reg_pay_num['regPayNum'],
-                'status': 'sent' if res else 'failed',
-                'link': link_payment
-            })
-        except Exception as e:
-            logger_msg(f"SQL: ошибка записи платежа для {uid}: {e}")
+        await record_payment(uid, summa, reg_pay_num, link_payment, 'sent' if res else 'failed')
 
         continue
 
