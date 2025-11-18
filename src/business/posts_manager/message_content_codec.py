@@ -191,46 +191,46 @@ async def send_packed_content(bot: Bot, chat_id: int, packed: str,
     data = try_parse_json(packed)
     if not data or 'type' not in data:
         # Обычный текст — просто отправляем
-        await bot.send_message(chat_id, packed or '', reply_markup=reply_markup)
+        await bot.send_message(chat_id, packed or '', reply_markup=reply_markup, protect_content=True)
         return True
 
     t = data.get('type')
     if t == 'text':
-        await bot.send_message(chat_id, data.get('text', '') or '', reply_markup=reply_markup)
+        await bot.send_message(chat_id, data.get('text', '') or '', reply_markup=reply_markup, protect_content=True)
         return True
 
     if t == 'photo':
         await bot.send_photo(chat_id, data.get('file_id', ''), caption=data.get('caption') or None,
-                             reply_markup=reply_markup)
+                             reply_markup=reply_markup, protect_content=True)
         return True
 
     if t == "video":
         await bot.send_video(chat_id, data.get('file_id', ''), caption=data.get('caption') or None,
-                             reply_markup=reply_markup)
+                             reply_markup=reply_markup, protect_content=True)
         return True
 
     if t == 'document':
         await bot.send_document(chat_id, data.get('file_id', ''), caption=data.get('caption') or None,
-                                reply_markup=reply_markup)
+                                reply_markup=reply_markup, protect_content=True)
         return True
 
     if t == 'animation':
         await bot.send_animation(chat_id, data.get('file_id', ''), caption=data.get('caption') or None,
-                                 reply_markup=reply_markup)
+                                 reply_markup=reply_markup, protect_content=True)
         return True
 
     if t == 'voice':
         await bot.send_voice(chat_id, data.get('file_id', ''), caption=data.get('caption') or None,
-                             reply_markup=reply_markup)
+                             reply_markup=reply_markup, protect_content=True)
         return True
 
     if t == 'audio':
         await bot.send_audio(chat_id, data.get('file_id', ''), caption=data.get('caption') or None,
-                             reply_markup=reply_markup)
+                             reply_markup=reply_markup, protect_content=True)
         return True
 
     # На всякий случай: неизвестный тип — отправляем как текст
-    await bot.send_message(chat_id, data.get('text', '') or '', reply_markup=reply_markup)
+    await bot.send_message(chat_id, data.get('text', '') or '', reply_markup=reply_markup, protect_content=True)
 
     return True
 
@@ -249,7 +249,7 @@ async def send_media_group_records(bot: Bot, chat_id: int, messages: List) -> bo
     items, caption = collect_album_items(messages)
     media = _to_input_media(items, caption)
     if media:
-        await bot.send_media_group(chat_id, media)
+        await bot.send_media_group(chat_id, media, protect_content=True)
         return True
     return False
 

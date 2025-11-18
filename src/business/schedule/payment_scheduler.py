@@ -73,7 +73,7 @@ async def check_payments_once() -> int:
                     msg = await text_manager.get_message('payment_success')
 
                     try:
-                        await bot.send_message(int(uid), msg, disable_notification=True)
+                        await bot.send_message(int(uid), msg, disable_notification=True, protect_content=True)
                     except Exception as e:
                         logger_msg(f"Ошибка отправки сообщения об оплате пользователю {uid}: {e}")
 
