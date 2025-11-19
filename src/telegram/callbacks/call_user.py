@@ -26,6 +26,9 @@ from src.business.text_edit.text_msg_call import text_msg_call
 from src.telegram.sendler.sendler import *
 
 from src.telegram.keyboard.keyboards import *
+from src.business.broadcast_any.broadcast_call_ import broadcast_any_call
+from src.business.broadcast_any.broadcast_send_call_ import broadcast_send_call
+from src.business.broadcast_any.broadcast_clear_call_ import broadcast_clear_call
 
 
 async def over_state(call: types.CallbackQuery, state: FSMContext):
@@ -81,6 +84,10 @@ def register_callbacks(dp: Dispatcher):
     dp.register_callback_query_handler(set_bet_call, text='set_bet', state='*')
 
     dp.register_callback_query_handler(add_time_bet_call, text='send_user_messages', state='*')
+
+    dp.register_callback_query_handler(broadcast_any_call, text='broadcast_any', state='*')
+    dp.register_callback_query_handler(broadcast_send_call, text='broadcast_send', state='*')
+    dp.register_callback_query_handler(broadcast_clear_call, text='broadcast_clear', state='*')
 
     dp.register_callback_query_handler(clear_bet_call, text='clear_bet', state='*')
 

@@ -23,6 +23,8 @@ class Admin_keyb:
 
         self._start_key.add(InlineKeyboardButton(text=f'🎲 Настройка прогноза', callback_data='bet_menu'))
 
+        self._start_key.add(InlineKeyboardButton(text=f'📣 Рассылка сообщений (всем)', callback_data='broadcast_any'))
+
         self._start_key.add(InlineKeyboardButton(text=f'🗂️ Настройка каналов', callback_data='chat_admin_call'))
 
         self._start_key.add(InlineKeyboardButton(text=f'✏️ Текста кнопок', callback_data='text_keyboards'))

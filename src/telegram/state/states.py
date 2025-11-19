@@ -10,6 +10,8 @@ from src.business.posts_manager.posts_state_ import posts_state
 from src.business.posts_manager.posts_states import PostsStates
 from src.business.send_payments.send_payments_state_ import send_payments_state
 from src.business.text_edit.edit_text_handler import handle_new_text
+from src.business.broadcast_any.broadcast_state_ import broadcast_state
+from src.business.broadcast_any.broadcast_states import BroadcastStates
 
 
 def register_state(dp: Dispatcher):
@@ -26,3 +28,5 @@ def register_state(dp: Dispatcher):
     dp.register_message_handler(change_logo_state, state=EditLogoStates.chane_logo, content_types=['photo'])
 
     dp.register_message_handler(posts_state, state=PostsStates.waiting_new_post, content_types=[types.ContentType.ANY])
+
+    dp.register_message_handler(broadcast_state, state=BroadcastStates.waiting_broadcast, content_types=[types.ContentType.ANY])
