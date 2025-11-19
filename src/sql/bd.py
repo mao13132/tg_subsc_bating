@@ -41,6 +41,8 @@ class Users(Base):
 
     need_paid = Column(Boolean, nullable=False, default=False)
 
+    received_forecast = Column(Boolean, nullable=False, default=False, comment=f'Получал ли пользователь последний прогноз')
+
     is_subs = Column(Boolean, nullable=False, default=False)
 
     other = Column(String, nullable=True)
@@ -220,6 +222,33 @@ class BotDB:
                 return True
         except Exception as es:
             error_ = f'SQL bulk_set_need_paid_true: "{es}"'
+            logger_msg(error_)
+            return False
+
+    async def bulk_update_users_by_filter(self, filters: dict, values: dict):
+        try:
+            async with self.async_session_maker() as session:
+                query = update(Users).filter_by(**filters).values(**values)
+                await session.execute(query)
+                await session.commit()
+                return True
+        except Exception as es:
+            error_ = f'SQL bulk_update_users_by_filter: "{es}"'
+            logger_msg(error_)
+            return False
+
+    async def set_received_forecast_for_ids(self, user_ids: list, value: bool = True):
+        try:
+            if not user_ids:
+                return True
+            async with self.async_session_maker() as session:
+                ids_str = [str(uid) for uid in user_ids]
+                query = update(Users).where(Users.id_user.in_(ids_str)).values(received_forecast=value)
+                await session.execute(query)
+                await session.commit()
+                return True
+        except Exception as es:
+            error_ = f'SQL set_received_forecast_for_ids: "{es}"'
             logger_msg(error_)
             return False
 

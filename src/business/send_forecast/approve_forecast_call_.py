@@ -32,7 +32,15 @@ async def approve_forecast_call(call: types.CallbackQuery, state: FSMContext):
         await Sendler_msg.send_msg_call(call, no_load, keyboard)
         return True
 
+    # Перед рассылкой сбрасываем флаг получения прогноза у целевой аудитории
+    await BotDB.bulk_update_users_by_filter({"need_paid": False, "is_subs": True}, {"received_forecast": False})
+
     res_send = await send_forecast_broadcast({"message": call.message, "messages": forecast_message})
+
+    # После рассылки отмечаем только тех, кому успешно доставлено
+    ok_ids = res_send.get("ok_ids") or []
+    if ok_ids:
+        await BotDB.set_received_forecast_for_ids(ok_ids, True)
 
     _msg = f'✅ Рассылка выполнена\nПользователей: {res_send["sent"]}\n' \
            f'Успешных доставок:{res_send["total"]}\nОшибки: {res_send["failed"]}'

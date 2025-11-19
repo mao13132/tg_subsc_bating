@@ -76,6 +76,6 @@ async def posts_state(message: Message, state: FSMContext):
 
         GROUP_TASKS[id_user] = asyncio.create_task(_prompt())
     else:
-        await Sendler_msg.send_msg_message(message, LOGO, msg_out, keyb)
+        await Sendler_msg.send_msg_message(message, msg_out, keyb)
 
     return True

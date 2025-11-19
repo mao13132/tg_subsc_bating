@@ -10,14 +10,19 @@ from src.telegram.bot_core import BotDB
 
 async def send_forecast_broadcast(settings):
     """
-    Разослать загруженный прогноз всем пользователям без задолженности.
+    Массовая рассылка загруженного прогноза всем пользователям без задолженности.
 
     Параметры:
     - settings['message']: объект сообщения (для доступа к боту: message.bot)
     - settings['messages']: список записей прогноза из БД (если не передан, будет прочитан внутри)
 
     Возвращает:
-    - dict: {"total": общее_число_пользователей, "sent": успешно_доставлено, "failed": ошибки}
+    - dict: {
+        "total": общее_число_пользователей,
+        "sent": успешно_доставлено,
+        "failed": ошибки,
+        "ok_ids": список ID пользователей, кому успешно доставлено
+      }
     """
     message = settings['message']
     messages = settings.get('messages')
@@ -30,6 +35,7 @@ async def send_forecast_broadcast(settings):
     users = await BotDB.get_users_need_paid_false() or []
 
     sent, failed = 0, 0
+    ok_ids = []
 
     # Отправка группированного контента каждому пользователю
     for uid in users:
@@ -40,9 +46,10 @@ async def send_forecast_broadcast(settings):
 
         if res:
             sent += 1
+            ok_ids.append(str(uid))
         else:
             failed += 1
 
-    # Итоговая сводка для админа
-    return {"total": len(users), "sent": sent, "failed": failed}
+    # Итоговая сводка для админа + список успешных доставок
+    return {"total": len(users), "sent": sent, "failed": failed, "ok_ids": ok_ids}
     

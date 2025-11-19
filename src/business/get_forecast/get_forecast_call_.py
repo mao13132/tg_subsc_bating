@@ -66,7 +66,8 @@ async def get_forecast_call(call: types.CallbackQuery, state: FSMContext):
 
     forecast_message = await BotDB.user_messages.read_by_filter({})
 
-    if not forecast_message:
+    # Если прогноз не загружен или пользователь в состояние тчо уже получал прогноз
+    if not forecast_message or user_data.received_forecast:
         no_load = await text_manager.get_message('no_load')
 
         await Sendler_msg.send_msg_call(call, no_load, keyboard)
@@ -75,6 +76,6 @@ async def get_forecast_call(call: types.CallbackQuery, state: FSMContext):
 
     res_send = await send_forecast({'message': call.message, "messages": forecast_message})
 
-    res_update_user = await BotDB.edit_user('need_paid', True, id_user)
+    res_update_user = await BotDB.edit_user('received_forecast', True, id_user)
 
     return True
