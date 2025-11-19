@@ -6,7 +6,7 @@
 # 1.0       2023    Initial Version
 #
 # ---------------------------------------------
-from src.business.posts_manager.message_content_codec import send_records_grouped
+from src.business.bet_menu.set_bet.message_content_codec import send_records_grouped
 
 
 async def send_forecast(settings):

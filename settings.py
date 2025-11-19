@@ -16,6 +16,8 @@ class States(StatesGroup):
 
     write_summa = State()
 
+    get_timer_bet = State()
+
 
 class EditTextState(StatesGroup):
     waiting_new_text = State()

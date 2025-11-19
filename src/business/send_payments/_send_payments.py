@@ -9,7 +9,6 @@
 from src.business.text_manager.text_manager import text_manager
 from src.telegram.bot_core import BotDB
 from src.telegram.keyboard.keyboards import Admin_keyb
-from src.utils.logger._logger import logger_msg
 from src.business.payments.payment_service import create_ckassa_payment, record_payment
 
 

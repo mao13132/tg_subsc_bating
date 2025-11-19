@@ -40,6 +40,8 @@ class UserMessage(Base):
 
     mg_index = Column(Integer, nullable=True, comment="Порядковый номер сообщения в медиа-группе")
 
+    expire_at = Column(DateTime, nullable=True, comment="Время удаления прогноза")
+
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow, comment="Дата создания")
 
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow,
@@ -147,3 +149,17 @@ class UserMessageCRUD:
             return False
 
         return True
+
+    async def set_expire_by_batch_key(self, id_user: str, batch_key: str, expire_at: datetime) -> bool:
+        try:
+            async with self.session_maker() as session:
+                q = update(UserMessage).where(
+                    UserMessage.id_user == str(id_user),
+                    UserMessage.batch_key == str(batch_key)
+                ).values(expire_at=expire_at)
+                res = await session.execute(q)
+                await session.commit()
+                return res.rowcount > 0
+        except Exception as e:
+            logger_msg(f"UserMessageCRUD set_expire_by_batch_key error: {e}")
+            return False

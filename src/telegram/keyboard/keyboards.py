@@ -86,6 +86,15 @@ class Admin_keyb:
 
         return self._start_key
 
+    def finish_timer_bet(self):
+        self._start_key = InlineKeyboardMarkup(row_width=1)
+
+        self._start_key.add(InlineKeyboardButton(text=f'✅ Подтверждаю', callback_data='approve_timer_bet'))
+
+        self._start_key.add(InlineKeyboardButton(text=f'🔙 Назад', callback_data='bet_menu'))
+
+        return self._start_key
+
     def back_main_menu(self, back_text):
         self._start_key = InlineKeyboardMarkup(row_width=1)
 
