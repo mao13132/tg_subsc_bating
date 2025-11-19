@@ -45,6 +45,8 @@ class Users(Base):
 
     is_subs = Column(Boolean, nullable=False, default=False)
 
+    send_payments = Column(Boolean, nullable=False, default=False)
+
     other = Column(String, nullable=True)
 
 
@@ -216,7 +218,7 @@ class BotDB:
     async def bulk_set_need_paid_true(self):
         try:
             async with self.async_session_maker() as session:
-                query = update(Users).where(Users.need_paid == False).values(need_paid=True)
+                query = update(Users).where(Users.need_paid == False).values(need_paid=True, send_payments=True)
                 await session.execute(query)
                 await session.commit()
                 return True

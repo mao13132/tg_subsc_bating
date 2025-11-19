@@ -71,6 +71,8 @@ async def check_payments_once() -> int:
                     await BotDB.payments.update_by_id(pid, {'status': norm})
 
                     await BotDB.edit_user('need_paid', False, uid)
+                    await BotDB.edit_user('received_forecast', False, uid)
+                    await BotDB.edit_user('send_payments', False, uid)
 
                     msg = await text_manager.get_message('payment_success')
 

@@ -22,7 +22,7 @@ async def send_payments(settings):
     template = await text_manager.get_message('send_payment')
     btn_text = await text_manager.get_button_text('paid')
 
-    users = await BotDB.users_read_by_filter(filters={'is_subs': True, 'need_paid': True}) or []
+    users = await BotDB.users_read_by_filter(filters={'is_subs': True, 'send_payments': False}) or []
 
     # 4) Рассылка по ID пользователей
     sent, failed = 0, 0
