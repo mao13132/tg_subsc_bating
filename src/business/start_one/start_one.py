@@ -17,6 +17,7 @@ from src.telegram.sendler.sendler import Sendler_msg
 from aiogram.types import Message, ChatActions
 
 from src.telegram.bot_core import BotDB
+from src.business.payments.unpaid_notifier import notify_unpaid_if_needed
 
 from aiogram.dispatcher import FSMContext
 
@@ -43,6 +44,10 @@ async def start_one(message: Message, state: FSMContext):
     new_user = await BotDB.check_or_add_user(id_user, data_user)
 
     await Sendler_msg.log_client_message(message)
+
+    # Проверка на не оплаченный счёт
+    if await notify_unpaid_if_needed(message, access_admin=True):
+        return False
 
     get_forecast_btn = await text_manager.get_button_text('get_forecast')
 

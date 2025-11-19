@@ -27,6 +27,8 @@ async def send_me_bet_call(call: types.CallbackQuery, state: FSMContext):
     forecast_message = await BotDB.user_messages.read_by_filter({})
 
     if not forecast_message:
+        keyboard = Admin_keyb().new_back_bets_menu()
+
         no_load = f'❌ Прогноз не загружен'
 
         await Sendler_msg().sendler_photo_call(call, LOGO, no_load, keyboard)

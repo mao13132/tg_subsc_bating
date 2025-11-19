@@ -61,6 +61,15 @@ class Admin_keyb:
 
         return self._start_key
 
+    def new_back_bets_menu(self):
+        self._start_key = InlineKeyboardMarkup(row_width=1)
+
+        self._start_key.add(InlineKeyboardButton(text=f'⌨️ Загрузить прогноз', callback_data='set_bet'))
+
+        self._start_key.add(InlineKeyboardButton(text=f'🔙 Назад', callback_data='bet_menu'))
+
+        return self._start_key
+
     def wait_keyb(self):
         self._start_key = InlineKeyboardMarkup(row_width=1)
 
@@ -84,13 +93,14 @@ class Admin_keyb:
 
         return self._start_key
 
-    def no_paid(self, back_text, pay_text=None, client_payment_link=None):
+    def no_paid(self, access_admin, pay_text=None, client_payment_link=None):
         self._start_key = InlineKeyboardMarkup(row_width=1)
 
         if pay_text and client_payment_link:
             self._start_key.add(InlineKeyboardButton(text=pay_text, url=client_payment_link))
 
-        self._start_key.add(InlineKeyboardButton(text=back_text, callback_data='over_state'))
+        if access_admin:
+            self._start_key.add(InlineKeyboardButton(text=f'⚙️ Админ панель', callback_data='admin_panel'))
 
         return self._start_key
 

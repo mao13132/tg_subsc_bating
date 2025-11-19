@@ -17,7 +17,7 @@ from src.telegram.keyboard.keyboards import Admin_keyb
 from src.telegram.sendler.sendler import Sendler_msg
 
 from src.telegram.bot_core import BotDB
-from src.business.payments.payment_service import ensure_payment_link
+from src.business.payments.unpaid_notifier import notify_unpaid_if_needed
 from src.utils.logger._logger import logger_msg
 
 CHANNEL_KEY = 'analytic_chat'
@@ -58,17 +58,8 @@ async def get_forecast_call(call: types.CallbackQuery, state: FSMContext):
 
     user_data = await BotDB.get_user_bu_id_user(id_user)
 
-    if user_data.need_paid:
-        info = await ensure_payment_link(str(id_user))
-        link = info.get('link')
-        summa = info.get('amount')
-
-        no_paid_msg = await text_manager.get_message('no_paid_msg')
-        no_paid_msg = no_paid_msg.format(summa=summa, link=link)
-
-        paid_text = await text_manager.get_button_text('paid')
-        keyboard = Admin_keyb().no_paid(back, paid_text, link)
-        await Sendler_msg().sendler_photo_call(call, LOGO, no_paid_msg, keyboard)
+    # Проверка на не оплаченный счёт
+    if await notify_unpaid_if_needed(call):
         return False
 
     keyboard = Admin_keyb().back_main_menu(back)
