@@ -24,6 +24,6 @@ class ManagersKeyboard:
 
         keyboard.add(InlineKeyboardButton(text=f'➕ Добавить менеджера', callback_data='add_managers'))
 
-        keyboard.add(InlineKeyboardButton(text=f'🔙 Назад', callback_data='admin_panel'))
+        keyboard.add(InlineKeyboardButton(text=f'🏚 Домой', callback_data='admin_panel'))
 
         return keyboard

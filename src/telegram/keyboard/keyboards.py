@@ -48,7 +48,7 @@ class Admin_keyb:
 
         self._start_key.add(InlineKeyboardButton(text=f'♻️ Повторить предложения', callback_data='repid_payments'))
 
-        self._start_key.add(InlineKeyboardButton(text=f'🔙 Назад', callback_data='admin_panel'))
+        self._start_key.add(InlineKeyboardButton(text=f'🏚 Домой', callback_data='admin_panel'))
 
         return self._start_key
 
@@ -56,6 +56,8 @@ class Admin_keyb:
         self._start_key = InlineKeyboardMarkup(row_width=1)
 
         self._start_key.add(InlineKeyboardButton(text=f'🔙 Назад', callback_data='bet_menu'))
+
+        self._start_key.add(InlineKeyboardButton(text=f'🏚 Домой', callback_data='admin_panel'))
 
         return self._start_key
 
@@ -82,6 +84,8 @@ class Admin_keyb:
 
         self._start_key.add(InlineKeyboardButton(text=f'🔙 Назад', callback_data='bet_menu'))
 
+        self._start_key.add(InlineKeyboardButton(text=f'🏚 Домой', callback_data='admin_panel'))
+
         return self._start_key
 
     def finish_timer_bet(self):
@@ -90,6 +94,8 @@ class Admin_keyb:
         self._start_key.add(InlineKeyboardButton(text=f'✅ Подтверждаю', callback_data='approve_timer_bet'))
 
         self._start_key.add(InlineKeyboardButton(text=f'🔙 Назад', callback_data='bet_menu'))
+
+        self._start_key.add(InlineKeyboardButton(text=f'🏚 Домой', callback_data='admin_panel'))
 
         return self._start_key
 
@@ -124,6 +130,8 @@ class Admin_keyb:
         self._start_key.add(InlineKeyboardButton(text=f'✅ Подтверждаю', callback_data='approve_forecast'))
 
         self._start_key.add(InlineKeyboardButton(text=f'🔙 Назад', callback_data='bet_menu'))
+
+        self._start_key.add(InlineKeyboardButton(text=f'🏚 Домой', callback_data='admin_panel'))
 
         return self._start_key
 

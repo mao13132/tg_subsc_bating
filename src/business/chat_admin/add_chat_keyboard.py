@@ -7,6 +7,8 @@ class ChatAdminKeyb:
 
         keyboard.add(InlineKeyboardButton(text=f'🔙 Назад', callback_data=f'chat_admin_call'))
 
+        keyboard.add(InlineKeyboardButton(text=f'🏚 Домой', callback_data='admin_panel'))
+
         return keyboard
 
     def chat_admin_btns(self, settings_in_sql):
@@ -16,6 +18,8 @@ class ChatAdminKeyb:
             keyboard.add(InlineKeyboardButton(text=f"🗂️ {data['name']}", callback_data=f'admin_chat-{key}'))
 
             continue
+
+        keyboard.add(InlineKeyboardButton(text=f'🏚 Домой', callback_data='admin_panel'))
 
         keyboard.add(InlineKeyboardButton(text=f'🔙 Назад', callback_data=f'admin_panel'))
 

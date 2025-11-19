@@ -10,4 +10,6 @@ class PostsKeyb:
 
         keyboard.add(InlineKeyboardButton(text="🔙 Назад", callback_data='bet_menu'))
 
+        keyboard.add(InlineKeyboardButton(text=f'🏚 Домой', callback_data='admin_panel'))
+
         return keyboard
