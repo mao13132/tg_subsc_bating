@@ -21,6 +21,6 @@ async def text_msg_call(call: types.CallbackQuery, state: FSMContext):
 
     text = "💬 Редактирование текстов сообщений\n\nВыберите текст для редактирования:"
 
-    await Sendler_msg().sendler_photo_call(call, LOGO, text, keyb)
+    await Sendler_msg.send_msg_call(call, text, keyb)
 
     return True

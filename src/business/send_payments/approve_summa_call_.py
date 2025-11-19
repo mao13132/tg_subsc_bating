@@ -28,7 +28,7 @@ async def approve_summa_call(call: types.CallbackQuery, state: FSMContext):
     if not summa:
         error_ = f'Кнопка устарела, начните процедуру заново'
 
-        await Sendler_msg().sendler_photo_call(call, LOGO, error_, keyboard)
+        await Sendler_msg.send_msg_call(call, error_, keyboard)
 
         return False
 
@@ -46,6 +46,6 @@ async def approve_summa_call(call: types.CallbackQuery, state: FSMContext):
     _msg = f'✅ Рассылка выполнена\nСумма: {summa}\nПользователей: {res_send["sent"]}\n' \
            f'Успешных доставок:{res_send["total"]}\nОшибки: {res_send["failed"]}'
 
-    await Sendler_msg().sendler_photo_message(call.message, LOGO, _msg, keyboard)
+    await Sendler_msg.send_msg_message(call.message, _msg, keyboard)
 
     return True

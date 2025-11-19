@@ -97,5 +97,5 @@ async def repid_payments_call(call: types.CallbackQuery, state: FSMContext):
         f"Без ссылки: {no_link}\n"
         f"Нет записи платежа: {no_payment}"
     )
-    await Sendler_msg().sendler_photo_message(call.message, LOGO, _msg, keyboard)
+    await Sendler_msg.send_msg_message(call.message, _msg, keyboard)
     return True

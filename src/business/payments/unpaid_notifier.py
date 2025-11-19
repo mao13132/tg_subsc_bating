@@ -11,10 +11,10 @@ from src.telegram.sendler.sendler import Sendler_msg
 async def notify_unpaid_if_needed(ctx, access_admin=False) -> bool:
     if isinstance(ctx, CallbackQuery):
         id_user = ctx.message.chat.id
-        sender = Sendler_msg().sendler_photo_call
+        sender = Sendler_msg.send_msg_call
     else:
         id_user = ctx.chat.id
-        sender = Sendler_msg().sendler_photo_message
+        sender = Sendler_msg.send_msg_message
 
     user_data = await BotDB.get_user_bu_id_user(id_user)
 
@@ -31,7 +31,7 @@ async def notify_unpaid_if_needed(ctx, access_admin=False) -> bool:
     paid_text = await text_manager.get_button_text('paid')
     keyboard = Admin_keyb().no_paid(access_admin, paid_text, link)
 
-    await sender(ctx, LOGO, no_paid_msg, keyboard)
+    await sender(ctx, no_paid_msg, keyboard)
 
     return True
     

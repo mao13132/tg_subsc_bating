@@ -68,7 +68,7 @@ async def add_manager_state(message: Message, state: FSMContext):
             # Менеджер с таким username уже существует
             _msg = f'❌ Менеджер с username {manager_login} уже существует'
             keyb = ManagersKeyboard.back_managers()
-            await Sendler_msg().sendler_photo_message(message, LOGO, _msg, keyb)
+            await Sendler_msg.send_msg_message(message, LOGO, _msg, keyb)
             await state.finish()
             return False
             
@@ -77,7 +77,7 @@ async def add_manager_state(message: Message, state: FSMContext):
             # Менеджер с таким ID уже существует
             _msg = f'❌ Менеджер с ID {manager_chat_id} уже существует'
             keyb = ManagersKeyboard.back_managers()
-            await Sendler_msg().sendler_photo_message(message, LOGO, _msg, keyb)
+            await Sendler_msg.send_msg_message(message, LOGO, _msg, keyb)
             await state.finish()
             return False
 
@@ -122,7 +122,7 @@ async def add_manager_state(message: Message, state: FSMContext):
     keyb = ManagersKeyboard.managers()
 
     if len(_msg) < 1024:
-        await Sendler_msg().sendler_photo_message(message, LOGO, _msg, keyb)
+        await Sendler_msg.send_msg_message(message, _msg, keyb)
     else:
         await division_message(message, _msg, keyb)
 

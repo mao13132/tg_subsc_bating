@@ -30,7 +30,7 @@ async def edit_text_button_call(call: types.CallbackQuery, state: FSMContext):
            f"Текущий текст: {current_text}\n\n" \
            f"Отправьте новый текст:"
 
-    await Sendler_msg().sendler_photo_call(call, LOGO, text, keyb)
+    await Sendler_msg.send_msg_call(call, text, keyb)
 
 
 async def edit_text_message_call(call: types.CallbackQuery, state: FSMContext):
@@ -56,4 +56,4 @@ async def edit_text_message_call(call: types.CallbackQuery, state: FSMContext):
            f"Текущий текст: {current_text}\n\n" \
            f"Отправьте новый текст:"
 
-    await Sendler_msg().sendler_photo_call(call, LOGO, text, keyb)
+    await Sendler_msg.send_msg_call(call, text, keyb)

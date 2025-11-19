@@ -33,7 +33,7 @@ async def handle_new_text(message: types.Message, state: FSMContext):
     else:
         text = "❌ Ошибка при обновлении текста"
 
-    await Sendler_msg().sendler_photo_message(message, LOGO, text, keyboard)
+    await Sendler_msg.send_msg_message(message, text, keyboard)
 
     await state.finish()
 

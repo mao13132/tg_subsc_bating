@@ -36,7 +36,7 @@ async def finish_timer_bet_call(call: types.CallbackQuery, state: FSMContext):
     if not forecast_message:
         keyboard = Admin_keyb().new_back_bets_menu()
         no_load = f'❌ Прогноз не загружен'
-        await Sendler_msg().sendler_photo_call(call, LOGO, no_load, keyboard)
+        await Sendler_msg.send_msg_call(call, no_load, keyboard)
         return True
 
     res_send = await send_forecast_broadcast({"message": call.message, "messages": forecast_message})
@@ -47,6 +47,6 @@ async def finish_timer_bet_call(call: types.CallbackQuery, state: FSMContext):
         f'🗓 Дата удаления прогноза: {dt_str or "не задана"}'
     )
 
-    await Sendler_msg().sendler_photo_message(call.message, LOGO, _msg, keyboard)
+    await Sendler_msg.send_msg_message(call.message, _msg, keyboard)
 
     return True

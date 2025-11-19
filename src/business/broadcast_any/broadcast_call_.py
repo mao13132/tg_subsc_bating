@@ -15,7 +15,7 @@ async def broadcast_any_call(call: types.CallbackQuery, state: FSMContext):
 
     keyb = BroadcastKeyb.collect_messages_keyb()
 
-    await Sendler_msg().sendler_photo_call(call, LOGO, _msg, keyb)
+    await Sendler_msg.send_msg_call(call, _msg, keyb)
 
     from src.business.broadcast_any.broadcast_states import BroadcastStates
     await BroadcastStates.waiting_broadcast.set()

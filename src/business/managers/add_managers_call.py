@@ -26,7 +26,7 @@ async def add_managers_call(call: types.CallbackQuery, state: FSMContext):
 
     keyb = ManagersKeyboard.back_managers()
 
-    await Sendler_msg().sendler_photo_call(call, LOGO, _msg, keyb)
+    await Sendler_msg.send_msg_call(call, _msg, keyb)
 
     await States.add_manager.set()
 

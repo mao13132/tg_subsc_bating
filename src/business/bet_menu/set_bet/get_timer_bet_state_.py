@@ -25,7 +25,7 @@ async def get_timer_bet_state(message: Message, state: FSMContext):
     parsed = parse_user_datetime(date_in)
 
     if not parsed['ok']:
-        await Sendler_msg().sendler_photo_message(message, LOGO, parsed['error'], keyboard)
+        await Sendler_msg.send_msg_message(message, parsed['error'], keyboard)
         return False
 
     dt_str = parsed['dt_str']

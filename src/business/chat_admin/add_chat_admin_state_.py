@@ -122,7 +122,7 @@ async def add_chat_admin_state(message: Message, state: FSMContext):
 
     keyboard = ChatAdminKeyb().chat_admin_btns(SETTINGS_CHATS)
 
-    await Sendler_msg().sendler_photo_message(message, LOGO, status_text, keyboard)
+    await Sendler_msg.send_msg_message(message, status_text, keyboard)
 
     if old_msg_id:
         try:

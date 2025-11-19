@@ -42,7 +42,7 @@ async def managers_call(call: types.CallbackQuery, state: FSMContext):
                        f'/dels_{manager["id"]}' for count, manager in enumerate(managers))
 
     if len(_msg) < 1024:
-        await Sendler_msg().sendler_photo_call(call, LOGO, _msg, keyb)
+        await Sendler_msg.send_msg_call(call, _msg, keyb)
     else:
         await division_message(call.message, _msg, keyb)
 

@@ -29,7 +29,7 @@ async def approve_forecast_call(call: types.CallbackQuery, state: FSMContext):
         keyboard = Admin_keyb().new_back_bets_menu()
 
         no_load = f'❌ Прогноз не загружен'
-        await Sendler_msg().sendler_photo_call(call, LOGO, no_load, keyboard)
+        await Sendler_msg.send_msg_call(call, no_load, keyboard)
         return True
 
     res_send = await send_forecast_broadcast({"message": call.message, "messages": forecast_message})
@@ -37,6 +37,6 @@ async def approve_forecast_call(call: types.CallbackQuery, state: FSMContext):
     _msg = f'✅ Рассылка выполнена\nПользователей: {res_send["sent"]}\n' \
            f'Успешных доставок:{res_send["total"]}\nОшибки: {res_send["failed"]}'
 
-    await Sendler_msg().sendler_photo_message(call.message, LOGO, _msg, keyboard)
+    await Sendler_msg.send_msg_message(call.message, _msg, keyboard)
 
     return True

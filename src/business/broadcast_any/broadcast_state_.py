@@ -103,5 +103,5 @@ async def broadcast_state(message: Message, state: FSMContext):
         await state.update_data(collect_count=count)
         _msg = "♻ Пришлите ещё сообщение или нажмите кнопку"
         msg_out = f'Получено сообщений: {count}\n\n{_msg}'
-        await Sendler_msg().sendler_photo_message(message, LOGO, msg_out, keyb)
+        await Sendler_msg.send_msg_message(message, msg_out, keyb)
         return True

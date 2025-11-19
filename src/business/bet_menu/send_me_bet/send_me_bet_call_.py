@@ -31,7 +31,7 @@ async def send_me_bet_call(call: types.CallbackQuery, state: FSMContext):
 
         no_load = f'❌ Прогноз не загружен'
 
-        await Sendler_msg().sendler_photo_call(call, LOGO, no_load, keyboard)
+        await Sendler_msg.send_msg_call(call, no_load, keyboard)
 
         return True
 
@@ -41,7 +41,7 @@ async def send_me_bet_call(call: types.CallbackQuery, state: FSMContext):
 
     _msg = f'Меню управления прогнозами'
 
-    await Sendler_msg().new_sendler_photo_call(call, LOGO, _msg, keyboard)
+    await Sendler_msg().new_sender_message_call(call, _msg, keyboard)
 
     return True
 

@@ -22,7 +22,7 @@ async def logo_change_call(call: types.CallbackQuery, state: FSMContext):
 
     keyboard = ChangeLogoKeyboard().back_admin()
 
-    res_send = await Sendler_msg().sendler_photo_call(call, LOGO, _msg, keyboard)
+    res_send = await Sendler_msg.send_msg_call(call, _msg, keyboard)
 
     await EditLogoStates.chane_logo.set()
 

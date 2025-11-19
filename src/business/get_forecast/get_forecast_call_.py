@@ -46,7 +46,7 @@ async def get_forecast_call(call: types.CallbackQuery, state: FSMContext):
     if not is_subscription:
         error_ = await text_manager.get_message('no_subs')
 
-        await Sendler_msg().sendler_photo_call(call, LOGO, error_, None)
+        await Sendler_msg.send_msg_call(call, error_, None)
 
         logger_msg(f'Пользователь {call.message.chat.id} без подписки, нажимал кнопку "Получить прогноз"')
 
@@ -69,7 +69,7 @@ async def get_forecast_call(call: types.CallbackQuery, state: FSMContext):
     if not forecast_message:
         no_load = await text_manager.get_message('no_load')
 
-        await Sendler_msg().sendler_photo_call(call, LOGO, no_load, keyboard)
+        await Sendler_msg.send_msg_call(call, no_load, keyboard)
 
         return True
 

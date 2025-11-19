@@ -19,7 +19,7 @@ async def broadcast_clear_call(call: types.CallbackQuery, state: FSMContext):
 
     _msg = '✅ Очередь очищена'
 
-    await Sendler_msg().sendler_photo_call(call, LOGO, _msg, keyb)
+    await Sendler_msg.send_msg_call(call, _msg, keyb)
 
     return True
     

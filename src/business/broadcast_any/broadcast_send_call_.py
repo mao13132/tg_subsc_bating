@@ -18,7 +18,7 @@ async def broadcast_send_call(call: types.CallbackQuery, state: FSMContext):
 
     if not records:
         _msg = '❌ Очередь пуста'
-        await Sendler_msg().sendler_photo_call(call, LOGO, _msg, keyb)
+        await Sendler_msg.send_msg_call(call, _msg, keyb)
         return True
 
     await state.finish()
@@ -35,7 +35,7 @@ async def broadcast_send_call(call: types.CallbackQuery, state: FSMContext):
     except:
         pass
 
-    await Sendler_msg().sendler_photo_message(call.message, LOGO, _msg, keyb)
+    await Sendler_msg.send_msg_call(call, _msg, keyb)
 
     return True
     

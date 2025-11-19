@@ -25,7 +25,7 @@ async def clear_bet_call(call: types.CallbackQuery, state: FSMContext):
 
     _msg = f'✅ Успешно очистил загруженный прогноз'
 
-    await Sendler_msg().sendler_photo_call(call, LOGO, _msg, keyboard)
+    await Sendler_msg.send_msg_call(call, _msg, keyboard)
 
     return True
 

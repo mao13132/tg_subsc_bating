@@ -41,6 +41,6 @@ async def finish_get_posts_call(call: types.CallbackQuery, state: FSMContext):
 
     keyboard = Admin_keyb().bet_keyboard()
 
-    res_send = await Sendler_msg().sendler_photo_call(call, LOGO, _msg, keyboard)
+    res_send = await Sendler_msg.send_msg_call(call, _msg, keyboard)
 
     return True

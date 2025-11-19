@@ -22,5 +22,5 @@ async def text_keyboards_call(call: types.CallbackQuery, state: FSMContext):
     
     text = "📝 Редактирование текстов кнопок\n\nВыберите текст для редактирования:"
     
-    await Sendler_msg().sendler_photo_call(call, LOGO, text, keyb)
+    await Sendler_msg.send_msg_call(call, text, keyb)
     

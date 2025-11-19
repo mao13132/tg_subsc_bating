@@ -52,7 +52,7 @@ async def admin_panel(call: types.CallbackQuery):
 
     text_admin = 'Панель управления'
 
-    await Sendler_msg().sendler_photo_call(call, LOGO, text_admin, keyb)
+    await Sendler_msg.send_msg_call(call, text_admin, keyb)
 
     return True
 

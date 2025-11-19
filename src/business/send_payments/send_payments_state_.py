@@ -24,7 +24,7 @@ async def send_payments_state(message: Message, state: FSMContext):
     if not str(summa).isdigit():
         error_ = f'❌ Вы ввели не число, пожалуйста введите число'
 
-        await Sendler_msg().sendler_photo_message(message, LOGO, error_, keyboard)
+        await Sendler_msg.send_msg_message(message, error_, keyboard)
 
         return False
 

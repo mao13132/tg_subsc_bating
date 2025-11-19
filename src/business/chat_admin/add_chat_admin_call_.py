@@ -40,7 +40,7 @@ async def add_chat_admin_call(call: types.CallbackQuery, state: FSMContext):
 
     keyboard = ChatAdminKeyb().back_add_chat()
 
-    res_send = await Sendler_msg().sendler_photo_call(call, LOGO, _msg, keyboard)
+    res_send = await Sendler_msg.send_msg_call(call, _msg, keyboard)
 
     await States.add_admin_chat.set()
 

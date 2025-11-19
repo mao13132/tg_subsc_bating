@@ -44,7 +44,7 @@ async def change_logo_state(message: Message, state: FSMContext):
 
     await state.finish()
 
-    await Sendler_msg().sendler_photo_message(message, LOGO, status_text, keyboard)
+    await Sendler_msg.send_msg_message(message, status_text, keyboard)
 
     await delete_old_msg(message, message.chat.id, old_msg_id)
 
