@@ -24,49 +24,54 @@ class Sendler_msg:
         return res_send
 
     async def sendler_to_admin_mute_bot(bot, text, keyb):
+        res_send = False
         for admin in ADMIN:
             try:
-                await bot.send_message(int(admin), text, reply_markup=keyb, disable_notification=True,
+                res_send = await bot.send_message(int(admin), text, reply_markup=keyb, disable_notification=True,
                                        protect_content=True)
             except:
                 continue
 
-        return True
+        return res_send
 
     async def sendler_to_admin_mute(message: Message, text, keyb):
+        res_send = False
         for admin in ADMIN:
             try:
-                await message.bot.send_message(int(admin), text, reply_markup=keyb, disable_notification=True,
+                res_send = await message.bot.send_message(int(admin), text, reply_markup=keyb, disable_notification=True,
                                                protect_content=True)
             except:
                 try:
-                    await message.bot.send_message(int(admin), text, protect_content=True)
+                    res_send = await message.bot.send_message(int(admin), text, protect_content=True)
                 except Exception as es:
                     if str(es) == 'Chat not found':
                         print(f'Бот не имеет права писать админу, напишите /start боту')
                     else:
                         print(f'Ошибка при отправке сообщение админу текст: "{text}" {es}')
+        return res_send
 
     async def sendler_to_admin(message: Message, text, keyb):
+        res_send = False
         for admin in ADMIN:
             try:
-                await message.bot.send_message(int(admin), text, reply_markup=keyb, protect_content=True)
+                res_send = await message.bot.send_message(int(admin), text, reply_markup=keyb, protect_content=True)
             except:
                 try:
-                    await message.bot.send_message(int(admin), text, protect_content=True)
+                    res_send = await message.bot.send_message(int(admin), text, protect_content=True)
                 except Exception as es:
                     if str(es) == 'Chat not found':
                         print(f'Бот не имеет права писать админу, напишите /start боту')
                     else:
                         print(f'Ошибка при отправке сообщение админу текст: "{text}" {es}')
+        return res_send
 
     async def forward_to_admin(message: Message):
         for admin in ADMIN:
             try:
-                msg = await message.bot.forward_message(int(admin), message.chat.id, message.message_id,
+                res_send = await message.bot.forward_message(int(admin), message.chat.id, message.message_id,
                                                         protect_content=True)
 
-                return msg
+                return res_send
             except Exception as es:
                 if str(es) == 'Chat not found':
                     print(f'Бот не имеет права писать админу, напишите /start боту')
@@ -79,13 +84,13 @@ class Sendler_msg:
         for admin in ADMIN:
             try:
 
-                msg = await reply_msg.reply(text=_msg, reply_markup=keyb, protect_content=True)
+                res_send = await reply_msg.reply(text=_msg, reply_markup=keyb, protect_content=True)
 
-                return msg
+                return res_send
 
             except:
                 try:
-                    await message.bot.send_message(int(admin), _msg, reply_markup=keyb, protect_content=True)
+                    res_send = await message.bot.send_message(int(admin), _msg, reply_markup=keyb, protect_content=True)
                 except Exception as es:
                     if str(es) == 'Chat not found':
                         print(f'Бот не имеет права писать админу, напишите /start боту')
@@ -95,18 +100,20 @@ class Sendler_msg:
                     return False
 
     async def sendler_admin_call(call: types.CallbackQuery, text, keyb):
+        res_send = False
         for admin in ADMIN:
             try:
-                await call.bot.send_message(int(admin), text, reply_markup=keyb, disable_web_page_preview=True,
+                res_send = await call.bot.send_message(int(admin), text, reply_markup=keyb, disable_web_page_preview=True,
                                             protect_content=True)
             except:
                 try:
-                    await call.bot.send_message(int(admin), text, disable_web_page_preview=True, protect_content=True)
+                    res_send = await call.bot.send_message(int(admin), text, disable_web_page_preview=True, protect_content=True)
                 except Exception as es:
                     if str(es) == 'Chat not found':
                         print(f'Бот не имеет права писать админу {admin}, напишите /start боту')
                     else:
                         print(f'Ошибка при отправке сообщение админу текст {admin},: "{text}" {es}')
+        return res_send
 
     async def send_msg_call(call: types.CallbackQuery, text_msg, keyb):
         if call.message.photo:
@@ -128,78 +135,78 @@ class Sendler_msg:
 
         try:
             # await call.message.edit_caption(caption=text_msg, reply_markup=keyb)
-            await call.message.edit_text(text=text_msg, reply_markup=keyb)
+            res_send = await call.message.edit_text(text=text_msg, reply_markup=keyb, disable_web_page_preview=True)
         except Exception as es:
             try:
-                await call.message.bot.send_message(call.message.chat.id, text_msg,
-                                                    reply_markup=keyb, protect_content=True)
+                res_send = await call.message.bot.send_message(call.message.chat.id, text_msg,
+                                                    reply_markup=keyb, protect_content=True, disable_web_page_preview=True)
             except Exception as es:
                 print(f'Произошла ошибка при отправке поста текст: "{text_msg}" ошибка: "{es}"')
                 return False
 
-        return True
+        return res_send
 
     async def send_msg_message(message: Message, text_msg, keyb):
+        res_send = False
         if message.photo != []:
 
             try:
-                await message.bot.send_message(message.chat.id, text_msg,
+                res_send = await message.bot.send_message(message.chat.id, text_msg,
                                                reply_markup=keyb, disable_web_page_preview=True, protect_content=True)
             except Exception as es:
                 print(f'Произошла ошибка при отправке поста текст: "{text_msg}" ошибка: "{es}"')
                 return False
         else:
             try:
-                await message.edit_text(text=text_msg, reply_markup=keyb, disable_web_page_preview=True)
+                res_send = await message.edit_text(text=text_msg, reply_markup=keyb, disable_web_page_preview=True)
             except:
                 try:
-                    await message.edit_caption(caption=text_msg, reply_markup=keyb)
+                    res_send = await message.edit_caption(caption=text_msg, reply_markup=keyb)
                 except:
                     try:
-                        await message.bot.send_message(message.chat.id, text_msg,
+                        res_send = await message.bot.send_message(message.chat.id, text_msg,
                                                        reply_markup=keyb, disable_web_page_preview=True,
                                                        protect_content=True)
                     except Exception as es:
                         print(f'Произошла ошибка при отправке поста текст2: "{text_msg}" ошибка: {es}"')
                         return False
 
-        return True
+        return res_send
 
     async def send_call_message(call: types.CallbackQuery, text_msg, keyb):
+        res_send = False
         if call.message.photo != []:
 
             try:
-                await call.message.bot.send_message(call.message.chat.id, text_msg,
+                res_send = await call.message.bot.send_message(call.message.chat.id, text_msg,
                                                     reply_markup=keyb, protect_content=True)
             except:
                 print(f'Произошла ошибка при отправке поста текст: "{text_msg}" send_call_message"')
                 return False
         else:
             try:
-                await call.message.edit_text(text=text_msg, reply_markup=keyb)
+                res_send = await call.message.edit_text(text=text_msg, reply_markup=keyb)
             except:
                 try:
-                    await call.message.edit_caption(caption=text_msg, reply_markup=keyb)
+                    res_send = await call.message.edit_caption(caption=text_msg, reply_markup=keyb)
                 except Exception as es:
                     try:
-                        await call.message.bot.send_message(call.message.chat.id, text_msg,
+                        res_send = await call.message.bot.send_message(call.message.chat.id, text_msg,
                                                             reply_markup=keyb, protect_content=True)
                     except:
                         print(f'Произошла ошибка при отправке поста текст: "{text_msg}" send_call_message2 {es}"')
                         return False
 
-        return True
+        return res_send
 
     async def reply_user(message: Message, text_msg):
-
         try:
-            await message.reply(text_msg, protect_content=True)
-
+            res_send = await message.reply(text_msg, protect_content=True)
         except Exception as es:
             print(f'Произошла ошибка при reply_user текст: "{text_msg}" ошибка: "{es}"')
             return False
 
-        return True
+        return res_send
 
     async def log_client_call(call: types.CallbackQuery):
 
@@ -217,11 +224,13 @@ class Sendler_msg:
 
         await BotDB.edit_user('last_time', datetime.now(), id_user)
 
+        res_send = True
         if LOGGER and id_user != DEVELOPER:
             try:
-                await call.message.bot.send_message(DEVELOPER, _msg, disable_notification=True, protect_content=True)
+                res_send = await call.message.bot.send_message(DEVELOPER, _msg, disable_notification=True, protect_content=True)
             except:
                 pass
+        return res_send
 
     async def log_client_message(message: Message):
 
@@ -234,11 +243,13 @@ class Sendler_msg:
 
         await BotDB.edit_user('last_time', datetime.now(), id_user)
 
+        res_send = True
         if LOGGER and id_user != DEVELOPER:
             try:
-                await message.bot.send_message(DEVELOPER, _msg, disable_notification=True, protect_content=True)
+                res_send = await message.bot.send_message(DEVELOPER, _msg, disable_notification=True, protect_content=True)
             except:
                 pass
+        return res_send
 
     async def sendler_photo_call(self, call, photo, text, keyb):
         try:
@@ -296,34 +307,33 @@ class Sendler_msg:
 
         try:
             if logo_file_id:
-                await call.message.bot.send_photo(call.message.chat.id, logo_file_id, caption=(text),
+                res_send = await call.message.bot.send_photo(call.message.chat.id, logo_file_id, caption=(text),
                                                   reply_markup=keyb, protect_content=True)
-                return True
+                return res_send
         except:
             logo_file_id = False
 
         if not logo_file_id:
             try:
                 with open(photo, 'rb') as file:
-                    await call.message.bot.send_photo(call.message.chat.id, file, caption=(text),
+                    res_send = await call.message.bot.send_photo(call.message.chat.id, file, caption=(text),
                                                       reply_markup=keyb, protect_content=True)
-                    return True
+                    return res_send
             except Exception as es:
                 print(f'Ошибка при отправке сообщения new_sendler_photo_call с фото {es}')
                 return False
 
-        return True
+        return False
 
     async def new_sender_message_call(self, call, text, keyb):
-
         try:
-            await call.message.bot.send_message(call.message.chat.id, text,
+            res_send = await call.message.bot.send_message(call.message.chat.id, text,
                                                 reply_markup=keyb, protect_content=True)
         except Exception as es:
             print(f'Ошибка при отправке сообщения new_sender_message_call {es}')
-            return str(es)
+            return False
 
-        return True
+        return res_send
 
     async def sendler_photo_call_html(self, call, photo, text, keyb):
         try:
@@ -331,27 +341,27 @@ class Sendler_msg:
             if logo_file_id:
                 try:
                     file_photo = types.InputMediaPhoto(logo_file_id)
-                    await call.message.edit_media(media=file_photo)
-                    await call.message.edit_caption(caption=text, reply_markup=keyb)
-                    return True
+                    res_send = await call.message.edit_media(media=file_photo)
+                    res_send = await call.message.edit_caption(caption=text, reply_markup=keyb)
+                    return res_send
                 except:
                     try:
-                        await call.message.bot.send_photo(call.message.chat.id, logo_file_id, caption=text,
+                        res_send = await call.message.bot.send_photo(call.message.chat.id, logo_file_id, caption=text,
                                                           reply_markup=keyb, protect_content=True)
-                        return True
+                        return res_send
                     except:
                         try:
                             with open(photo, 'rb') as file:
                                 file_photo = types.InputMediaPhoto(file)
-                                await call.message.edit_media(media=file_photo)
-                                await call.message.edit_caption(caption=text, reply_markup=keyb)
-                                return True
+                                res_send = await call.message.edit_media(media=file_photo)
+                                res_send = await call.message.edit_caption(caption=text, reply_markup=keyb)
+                                return res_send
                         except:
                             try:
                                 with open(photo, 'rb') as file:
-                                    await call.message.bot.send_photo(call.message.chat.id, file, caption=text,
+                                    res_send = await call.message.bot.send_photo(call.message.chat.id, file, caption=text,
                                                                       reply_markup=keyb, protect_content=True)
-                                    return True
+                                    return res_send
                             except Exception as es:
                                 print(f'Ошибка при отправке сообщения call с фото {es}')
                                 return False
@@ -360,20 +370,20 @@ class Sendler_msg:
         try:
             with open(photo, 'rb') as file:
                 file_photo = types.InputMediaPhoto(file)
-                await call.message.edit_media(media=file_photo)
-                await call.message.edit_caption(caption=text, reply_markup=keyb)
-                return True
+                res_send = await call.message.edit_media(media=file_photo)
+                res_send = await call.message.edit_caption(caption=text, reply_markup=keyb)
+                return res_send
         except:
             try:
                 with open(photo, 'rb') as file:
-                    await call.message.bot.send_photo(call.message.chat.id, file, caption=text,
+                    res_send = await call.message.bot.send_photo(call.message.chat.id, file, caption=text,
                                                       reply_markup=keyb, protect_content=True)
-                    return True
+                    return res_send
             except Exception as es:
                 print(f'Ошибка при отправке сообщения call с фото {es}')
                 return False
 
-        return True
+        return False
 
     async def sendler_photo_message(self, message, photo, text, keyb):
         try:
@@ -381,27 +391,27 @@ class Sendler_msg:
             if logo_file_id:
                 try:
                     file_photo = types.InputMediaPhoto(logo_file_id)
-                    await message.edit_media(media=file_photo)
-                    await message.edit_caption(caption=text, reply_markup=keyb)
-                    return True
+                    res_send = await message.edit_media(media=file_photo)
+                    res_send = await message.edit_caption(caption=text, reply_markup=keyb)
+                    return res_send
                 except:
                     try:
-                        await message.bot.send_photo(message.chat.id, logo_file_id, caption=(text),
+                        res_send = await message.bot.send_photo(message.chat.id, logo_file_id, caption=(text),
                                                      reply_markup=keyb, protect_content=True)
-                        return True
+                        return res_send
                     except:
                         try:
                             with open(photo, 'rb') as file:
                                 file_photo = types.InputMediaPhoto(file)
-                                await message.edit_media(media=file_photo)
-                                await message.edit_caption(caption=text, reply_markup=keyb)
-                                return True
+                                res_send = await message.edit_media(media=file_photo)
+                                res_send = await message.edit_caption(caption=text, reply_markup=keyb)
+                                return res_send
                         except:
                             try:
                                 with open(photo, 'rb') as file:
-                                    await message.bot.send_photo(message.chat.id, file, caption=(text),
+                                    res_send = await message.bot.send_photo(message.chat.id, file, caption=(text),
                                                                  reply_markup=keyb, protect_content=True)
-                                    return True
+                                    return res_send
                             except Exception as es:
                                 print(f'Ошибка при отправке сообщение msg с фото {es}')
                                 return False
@@ -410,53 +420,53 @@ class Sendler_msg:
         try:
             with open(photo, 'rb') as file:
                 file_photo = types.InputMediaPhoto(file)
-                await message.edit_media(media=file_photo)
-                await message.edit_caption(caption=text, reply_markup=keyb)
-                return True
+                res_send = await message.edit_media(media=file_photo)
+                res_send = await message.edit_caption(caption=text, reply_markup=keyb)
+                return res_send
         except:
             try:
                 with open(photo, 'rb') as file:
-                    await message.bot.send_photo(message.chat.id, file, caption=(text),
+                    res_send = await message.bot.send_photo(message.chat.id, file, caption=(text),
                                                  reply_markup=keyb, protect_content=True)
-                    return True
+                    return res_send
             except Exception as es:
                 print(f'Ошибка при отправке сообщение msg с фото {es}')
                 return False
 
-        return True
+        return False
 
     async def sender_photo_bot(self, bot, id_user, photo, text, keyb):
         try:
             logo_file_id = await Sendler_msg._get_logo_file_id()
             if logo_file_id:
-                await bot.send_photo(id_user, logo_file_id, caption=text, reply_markup=keyb, protect_content=True)
-                return True
+                res_send = await bot.send_photo(id_user, logo_file_id, caption=text, reply_markup=keyb, protect_content=True)
+                return res_send
         except:
             try:
                 with open(photo, 'rb') as file:
-                    await bot.send_photo(id_user, file, caption=text, reply_markup=keyb, protect_content=True)
-                    return True
+                    res_send = await bot.send_photo(id_user, file, caption=text, reply_markup=keyb, protect_content=True)
+                    return res_send
             except Exception as es:
                 print(f'Ошибка при отправке сообщение sender_photo_bot с фото {es}')
                 return False
 
-        return True
+        return False
 
     async def new_sendler_photo_message(self, message, photo, text, keyb):
         try:
             logo_file_id = await Sendler_msg._get_logo_file_id()
             if logo_file_id:
-                await message.bot.send_photo(message.chat.id, logo_file_id, caption=(text),
+                res_send = await message.bot.send_photo(message.chat.id, logo_file_id, caption=(text),
                                              reply_markup=keyb, protect_content=True)
-                return True
+                return res_send
         except:
             try:
                 with open(photo, 'rb') as file:
-                    await message.bot.send_photo(message.chat.id, file, caption=(text),
+                    res_send = await message.bot.send_photo(message.chat.id, file, caption=(text),
                                                  reply_markup=keyb, protect_content=True)
-                    return True
+                    return res_send
             except Exception as es:
                 print(f'Ошибка при отправке сообщение new_sendler_photo_message с фото {es}')
                 return False
 
-        return True
+        return False

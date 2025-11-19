@@ -138,7 +138,7 @@ class BotDB:
 
                 return result.value
         except Exception as es:
-            error_ = f'SQL get_setting: "{es}"'
+            error_ = f'SQL get_setting: "{es}" "{key}"'
 
             logger_msg(error_)
 
