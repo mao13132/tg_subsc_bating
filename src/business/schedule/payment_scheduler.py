@@ -8,14 +8,16 @@
 # - Снимает флаг need_paid у пользователя при успешной оплате
 # ---------------------------------------------
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, List
 
 from settings import SHOPKEY, SECKEY, CHECK_PAYMENT_EVERY
+from src.telegram.keyboard.keyboards import Admin_keyb
 from src.utils.logger._logger import logger_msg
 from src.telegram.bot_core import BotDB, bot
 from src.business.payments_api.check_payment_ckassa import CKassaPaymentChecker
 from src.business.text_manager.text_manager import text_manager
+from src.telegram.sendler.sendler import Sendler_msg
 
 
 async def check_payments_once() -> int:
@@ -72,8 +74,17 @@ async def check_payments_once() -> int:
 
                     msg = await text_manager.get_message('payment_success')
 
+                    get_forecast_btn = await text_manager.get_button_text('get_forecast')
+
+                    admin_link = await text_manager.get_button_text('admin_link')
+
+                    admin_text = await text_manager.get_button_text('admin_text')
+
+                    keyboard = Admin_keyb().good_payments(get_forecast_btn, admin_text, admin_link)
+
                     try:
-                        await bot.send_message(int(uid), msg, disable_notification=True, protect_content=True)
+                        await bot.send_message(int(uid), msg, reply_markup=keyboard, disable_notification=True,
+                                               protect_content=True)
                     except Exception as e:
                         logger_msg(f"Ошибка отправки сообщения об оплате пользователю {uid}: {e}")
 
@@ -104,6 +115,22 @@ async def check_payments_once() -> int:
             await asyncio.sleep(0)
 
     return processed_ok
+
+
+async def check_expired_messages_once() -> int:
+    try:
+        before = datetime.utcnow() + timedelta(hours=3)
+        deleted = await BotDB.user_messages.delete_expired(before)
+        if deleted:
+            try:
+                await Sendler_msg.sendler_to_admin_mute_bot(bot, f"🗑 Автоудаление прогноза: удалено записей {deleted}",
+                                                            None)
+            except Exception as es:
+                logger_msg(f"Notify admin about expired deletion error: {es}")
+        return int(deleted or 0)
+    except Exception as e:
+        logger_msg(f"Delete expired messages error: {e}")
+        return 0
 
 
 class PaymentScheduler:
@@ -153,9 +180,13 @@ class PaymentScheduler:
             print("🔄 Запуск цикла автоматической проверки платежей")
             while self.is_running:
                 try:
-                    count = await check_payments_once()
-                    if count > 0:
-                        print(f"✅ Обработано оплаченных платежей: {count}")
+                    count_pay = await check_payments_once()
+                    if count_pay > 0:
+                        print(f"✅ Обработано оплаченных платежей: {count_pay}")
+
+                    count_exp = await check_expired_messages_once()
+                    if count_exp > 0:
+                        print(f"🧹 Удалено просроченных сообщений: {count_exp}")
                     await asyncio.sleep(CHECK_PAYMENT_EVERY)
                 except asyncio.CancelledError:
                     logger_msg("🛑 Цикл проверки платежей отменен")

@@ -163,3 +163,17 @@ class UserMessageCRUD:
         except Exception as e:
             logger_msg(f"UserMessageCRUD set_expire_by_batch_key error: {e}")
             return False
+
+    async def delete_expired(self, before: datetime) -> int:
+        try:
+            async with self.session_maker() as session:
+                q = delete(UserMessage).where(
+                    UserMessage.expire_at.isnot(None),
+                    UserMessage.expire_at <= before
+                )
+                res = await session.execute(q)
+                await session.commit()
+                return res.rowcount
+        except Exception as e:
+            logger_msg(f"UserMessageCRUD delete_expired error: {e}")
+            return 0

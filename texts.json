@@ -2,7 +2,9 @@
   "buttons": {
     "get_forecast": "\uD83C\uDFB2 Получить прогноз",
     "back": "\uD83D\uDD19 Назад",
-    "paid": "✅ Оплатить прогноз"
+    "paid": "✅ Оплатить прогноз",
+    "admin_text": "\uD83D\uDCF8 Отправить скриншот",
+    "admin_link": "https://t.me/CalmHero"
   },
   "messages": {
     "welcome": "Добро пожаловать!\uD83E\uDD1D\n\nС помощью бота вы можете\nполучить авторский прогноз\nна послеоплату.\n\n\uD83D\uDD39 Жми кнопку БЕРУ и бот пришлет актуальный прогноз\uD83D\uDC47\uD83C\uDFFB",

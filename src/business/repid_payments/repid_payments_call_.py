@@ -74,7 +74,7 @@ async def repid_payments_call(call: types.CallbackQuery, state: FSMContext):
             logger_msg(f"Resend payments: send error for {uid}: {e}")
             res = False
 
-        status = 'resent' if res else 'resent_failed'
+        status = 'sent' if res else 'error'
         if res:
             sent += 1
         else:
