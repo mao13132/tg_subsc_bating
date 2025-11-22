@@ -3,7 +3,6 @@ from types import SimpleNamespace
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message
 
-from settings import LOGO
 from src.telegram.sendler.sendler import Sendler_msg
 from src.telegram.bot_core import BotDB
 from src.business.bet_menu.set_bet.message_content_codec import pack_message_content, send_packed_content, \
