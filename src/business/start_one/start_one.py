@@ -14,7 +14,7 @@ from src.telegram.keyboard.keyboards import Admin_keyb
 
 from src.telegram.sendler.sendler import Sendler_msg
 
-from aiogram.types import Message, ChatActions
+from aiogram.types import Message, ChatActions, ReplyKeyboardMarkup, KeyboardButton
 
 from src.telegram.bot_core import BotDB
 from src.business.payments.unpaid_notifier import notify_unpaid_if_needed
@@ -22,7 +22,7 @@ from src.business.payments.unpaid_notifier import notify_unpaid_if_needed
 from aiogram.dispatcher import FSMContext
 
 
-async def start_one(message: Message, state: FSMContext):
+async def start_one(message: Message, state: FSMContext, skip_btn_menu=True):
     await state.finish()
 
     try:
@@ -58,5 +58,10 @@ async def start_one(message: Message, state: FSMContext):
     start_message = await text_manager.get_message('welcome')
 
     await Sendler_msg().sendler_photo_message(message, LOGO, start_message, keyb)
+
+    if not skip_btn_menu:
+        reply_keyb = ReplyKeyboardMarkup(resize_keyboard=True)
+        reply_keyb.add(KeyboardButton('ПОЛУЧИТЬ ПРОГНОЗ🌎🫷🏻'), KeyboardButton('Задать вопрос'))
+        await message.bot.send_message(id_user, 'Меню', reply_markup=reply_keyb, disable_web_page_preview=True, protect_content=True)
 
     return True
