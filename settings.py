@@ -16,6 +16,8 @@ class States(StatesGroup):
 
     write_summa = State()
 
+    get_summa_forecast = State()
+
     get_timer_bet = State()
 
 

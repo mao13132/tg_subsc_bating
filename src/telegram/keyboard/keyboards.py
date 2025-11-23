@@ -137,11 +137,28 @@ class Admin_keyb:
 
         return self._start_key
 
+    def offers_client(self, offer_id: int, get_offer_btn: str, back_text='', back_callback=''):
+        self._start_key = InlineKeyboardMarkup(row_width=1)
+
+        self._start_key.add(InlineKeyboardButton(text=get_offer_btn, callback_data=f'get_offer-{offer_id}'))
+
+        if back_text:
+            self._start_key.add(InlineKeyboardButton(text=back_text, callback_data=back_callback))
+
+        return self._start_key
+
     def good_payments(self, get_forecast_btn, admin_text, admin_link):
         self._start_key = InlineKeyboardMarkup(row_width=1)
 
         self._start_key.add(InlineKeyboardButton(text=get_forecast_btn, callback_data='get_forecast'))
 
         self._start_key.add(InlineKeyboardButton(text=admin_text, url=admin_link))
+
+        return self._start_key
+
+    def forecast_call_keyb(self, get_forecast_btn: str):
+        self._start_key = InlineKeyboardMarkup(row_width=1)
+
+        self._start_key.add(InlineKeyboardButton(text=get_forecast_btn, callback_data='get_forecast'))
 
         return self._start_key

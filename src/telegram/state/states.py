@@ -1,6 +1,7 @@
 from aiogram import Dispatcher, types
 
 from settings import States, EditTextState
+from src.business.bet_menu.set_bet.get_summa_forecast_state_ import get_summa_forecast_state
 from src.business.bet_menu.set_bet.get_timer_bet_state_ import get_timer_bet_state
 from src.business.logo.logo_states import EditLogoStates
 from src.business.logo.change_logo_state_ import change_logo_state
@@ -22,6 +23,8 @@ def register_state(dp: Dispatcher):
     dp.register_message_handler(add_chat_admin_state, state=States.add_admin_chat)
 
     dp.register_message_handler(send_payments_state, state=States.write_summa)
+
+    dp.register_message_handler(get_summa_forecast_state, state=States.get_summa_forecast)
 
     dp.register_message_handler(get_timer_bet_state, state=States.get_timer_bet)
 

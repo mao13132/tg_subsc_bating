@@ -21,6 +21,7 @@ class Payments(Base):
     reg_pay_num = Column(String, nullable=True, index=True)
     link = Column(String, nullable=False, default='created')
     status = Column(String, nullable=False, default='created')
+    offer_id = Column(Integer, nullable=True, index=True)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
 

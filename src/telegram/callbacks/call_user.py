@@ -4,15 +4,16 @@ from aiogram.dispatcher import FSMContext
 from src.business.bet_menu.bet_menu_call_ import bet_menu_call
 from src.business.bet_menu.clear_bet.clear_bet_call_ import clear_bet_call
 from src.business.bet_menu.send_me_bet.send_me_bet_call_ import send_me_bet_call
+from src.business.bet_menu.set_bet.add_summa_bet_call_ import add_summa_bet_call
 from src.business.bet_menu.set_bet.set_bet_call_ import set_bet_call
 from src.business.chat_admin.add_chat_admin_call_ import add_chat_admin_call
 from src.business.chat_admin.chat_admin_call_ import chat_admin_call
 from src.business.get_forecast.get_forecast_call_ import get_forecast_call
+from src.business.get_offer.get_offer_call_ import get_offer_call
 from src.business.logo.logo_change_call_ import logo_change_call
 from src.business.managers.add_managers_call import add_managers_call
 from src.business.managers.check_manager import check_manager
 from src.business.managers.managers_call import managers_call
-from src.business.posts_manager.add_timer_bet_call_ import add_time_bet_call
 from src.business.repid_payments.repid_payments_call_ import repid_payments_call
 from src.business.send_forecast.approve_forecast_call_ import approve_forecast_call
 from src.business.send_forecast.send_forecast_call_ import send_forecast_call
@@ -83,7 +84,7 @@ def register_callbacks(dp: Dispatcher):
 
     dp.register_callback_query_handler(set_bet_call, text='set_bet', state='*')
 
-    dp.register_callback_query_handler(add_time_bet_call, text='send_user_messages', state='*')
+    dp.register_callback_query_handler(add_summa_bet_call, text='send_user_messages', state='*')
 
     dp.register_callback_query_handler(broadcast_any_call, text='broadcast_any', state='*')
     dp.register_callback_query_handler(broadcast_send_call, text='broadcast_send', state='*')
@@ -103,3 +104,5 @@ def register_callbacks(dp: Dispatcher):
     dp.register_callback_query_handler(approve_forecast_call, text='approve_forecast', state='*')
 
     dp.register_callback_query_handler(repid_payments_call, text='repid_payments', state='*')
+
+    dp.register_callback_query_handler(get_offer_call, text_contains='get_offer-', state='*')

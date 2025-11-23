@@ -6,26 +6,30 @@
 # 1.0       2023    Initial Version
 #
 # ---------------------------------------------
-# ---------------------------------------------
-# Program by @developer_telegrams
-#
-#
-# Version   Date        Info
-# 1.0       2023    Initial Version
-#
-# ---------------------------------------------
-from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.types import Message
 
-from settings import States
+from settings import LOGO, States
+from src.business.delete_old_msg.delete_old_msg_ import delete_old_msg
 from src.telegram.keyboard.keyboards import Admin_keyb
 from src.telegram.sendler.sendler import Sendler_msg
+from src.utils.datetime_parser import parse_user_datetime
 
 
-async def add_time_bet_call(call: types.CallbackQuery, state: FSMContext):
-    await Sendler_msg.log_client_call(call)
+async def get_summa_forecast_state(message: Message, state: FSMContext):
+    await Sendler_msg.log_client_message(message)
 
-    id_user = call.message.chat.id
+    summa = message.text.strip()
+
+    keyboard = Admin_keyb().back_bets_menu()
+
+    if not str(summa).isdigit() or int(summa) <= 0:
+        await Sendler_msg.send_msg_message(message, f'❌ Вы ввели не сумму, пожалуйста, напишите сумму', keyboard)
+        return False
+
+    data_state = await state.get_data()
+
+    old_msg_id = data_state.get('old_msg_id', False)
 
     _msg = (
         '♻️ Введите дату и время, после которого прогноз удаляется\n\n'
@@ -43,7 +47,11 @@ async def add_time_bet_call(call: types.CallbackQuery, state: FSMContext):
 
     keyboard = Admin_keyb().back_bets_menu()
 
-    res_send = await Sendler_msg.send_msg_call(call, _msg, keyboard)
+    res_send = await Sendler_msg.send_msg_message(message, _msg, keyboard)
+
+    await state.update_data(summa=summa, old_msg_id=res_send.message_id)
+
+    await delete_old_msg(message, message.chat.id, old_msg_id)
 
     await States.get_timer_bet.set()
 

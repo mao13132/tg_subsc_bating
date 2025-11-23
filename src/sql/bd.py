@@ -16,6 +16,7 @@ from settings import SQL_URL, Base
 from src.sql.texts import TextsCRUD
 from src.sql.user_messages import UserMessageCRUD
 from src.sql.payments import PaymentsCRUD
+from src.sql.offers import OffersCRUD
 from src.utils.logger._logger import logger_msg
 from src.utils.telegram_debug import SendlerOneCreate
 
@@ -86,6 +87,9 @@ class BotDB:
 
             # Инициализируем CRUD для платежей
             self.payments = PaymentsCRUD(self.async_session_maker)
+
+            # Инициализируем CRUD для предложений
+            self.offers = OffersCRUD(self.async_session_maker)
         except Exception as es:
             error_ = f'SQL не могу создать подключение "{es}"'
 
@@ -263,6 +267,18 @@ class BotDB:
                 return result
         except Exception as es:
             error_ = f'SQL get_all_users: "{es}"'
+            logger_msg(error_)
+            return False
+
+    async def get_users_subscribed(self):
+        try:
+            async with self.async_session_maker() as session:
+                query = select(Users.id_user).where(Users.is_subs == True)
+                response = await session.execute(query)
+                result = [row[0] for row in response.all()] if response else []
+                return result
+        except Exception as es:
+            error_ = f'SQL get_users_subscribed: "{es}"'
             logger_msg(error_)
             return False
 

@@ -14,6 +14,7 @@ from src.business.send_payments._send_payments import send_payments
 from src.telegram.keyboard.keyboards import Admin_keyb
 from src.telegram.sendler.sendler import Sendler_msg
 from src.telegram.bot_core import BotDB
+from src.business.text_manager.text_manager import text_manager
 
 
 async def approve_summa_call(call: types.CallbackQuery, state: FSMContext):
@@ -39,13 +40,45 @@ async def approve_summa_call(call: types.CallbackQuery, state: FSMContext):
     except:
         pass
 
-    res_send = await send_payments({"message": call.message, "summa": summa})
+    if str(summa) == '0':
+        replacement_text = await text_manager.get_message('replacement')
+        get_forecast_btn = await text_manager.get_button_text('get_forecast')
+        keyb_forecast = Admin_keyb().forecast_call_keyb(get_forecast_btn)
 
-    await BotDB.bulk_set_need_paid_true()
+        users = await BotDB.users_read_by_filter({'is_subs': True}) or []
+        sent = 0
+        failed = 0
+        for user in users:
+            uid = user.id_user
+            try:
+                res = await call.message.bot.send_message(int(uid), replacement_text,
+                                                          reply_markup=keyb_forecast,
+                                                          disable_web_page_preview=True,
+                                                          protect_content=True)
+                try:
+                    await call.message.bot.pin_chat_message(chat_id=int(uid), message_id=res['message_id'])
+                except:
+                    pass
+                sent += 1
+            except:
+                failed += 1
 
-    _msg = f'✅ Рассылка выполнена\nСумма: {summa}\nПользователей: {res_send["sent"]}\n' \
-           f'Успешных доставок:{res_send["total"]}\nОшибки: {res_send["failed"]}'
+        _msg = (
+            f'✅ Рассылка выполнена (замена)\n'
+            f'Пользователей: {len(users)}\n'
+            f'Отправлено: {sent}\n'
+            f'Ошибки: {failed}'
+        )
 
-    await Sendler_msg.send_msg_message(call.message, _msg, keyboard)
+        await Sendler_msg.send_msg_message(call.message, _msg, keyboard)
+    else:
+        res_send = await send_payments({"message": call.message, "summa": summa})
+
+        await BotDB.bulk_set_need_paid_true()
+
+        _msg = f'✅ Рассылка выполнена\nСумма: {summa}\nПользователей: {res_send["sent"]}\n' \
+               f'Успешных доставок:{res_send["total"]}\nОшибки: {res_send["failed"]}'
+
+        await Sendler_msg.send_msg_message(call.message, _msg, keyboard)
 
     return True

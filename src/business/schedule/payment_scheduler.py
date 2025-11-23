@@ -18,6 +18,8 @@ from src.telegram.bot_core import BotDB, bot
 from src.business.payments_api.check_payment_ckassa import CKassaPaymentChecker
 from src.business.text_manager.text_manager import text_manager
 from src.telegram.sendler.sendler import Sendler_msg
+from src.business.offers.send_offer_content import send_offer_content_to_user
+from src.business.offers.offers_json import add_id_user
 
 
 async def check_payments_once() -> int:
@@ -90,6 +92,17 @@ async def check_payments_once() -> int:
                     except Exception as e:
                         logger_msg(f"Ошибка отправки сообщения об оплате пользователю {uid}: {e}")
 
+                    offer_id = getattr(p, 'offer_id', None)
+                    if offer_id:
+                        await send_offer_content_to_user(bot, int(uid), int(offer_id))
+                        try:
+                            offer = await BotDB.offers.read_by_id(int(offer_id))
+                            current = getattr(offer, 'paid_users', None)
+                            paid_json = add_id_user(current, uid)
+                            await BotDB.offers.update_by_id(int(offer_id), {"paid_users": paid_json})
+                        except Exception as e:
+                            logger_msg(f"Ошибка записи оплатившего в Offer {offer_id}: {e}")
+
                     processed_ok += 1
                     continue
 
@@ -122,16 +135,27 @@ async def check_payments_once() -> int:
 async def check_expired_messages_once() -> int:
     try:
         before = datetime.utcnow() + timedelta(hours=3)
-        deleted = await BotDB.user_messages.delete_expired(before)
-        if deleted:
+        deleted_msgs = await BotDB.user_messages.delete_expired(before)
+        deleted_offers = 0
+        try:
+            deleted_offers = await BotDB.offers.delete_expired(before)
+        except Exception as es:
+            logger_msg(f"Delete expired offers error: {es}")
+
+        if (deleted_msgs or 0) > 0 or (deleted_offers or 0) > 0:
             try:
-                await Sendler_msg.sendler_to_admin_mute_bot(bot, f"🗑 Автоудаление прогноза: удалено записей {deleted}",
-                                                            None)
+                text = (
+                    f"🗑 Автоудаление:\n"
+                    f"• прогнозов: {int(deleted_msgs or 0)}\n"
+                    f"• предложений: {int(deleted_offers or 0)}"
+                )
+                await Sendler_msg.sendler_to_admin_mute_bot(bot, text, None)
             except Exception as es:
                 logger_msg(f"Notify admin about expired deletion error: {es}")
-        return int(deleted or 0)
+
+        return int((deleted_msgs or 0) + (deleted_offers or 0))
     except Exception as e:
-        logger_msg(f"Delete expired messages error: {e}")
+        logger_msg(f"Delete expired messages/offers error: {e}")
         return 0
 
 

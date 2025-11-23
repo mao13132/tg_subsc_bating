@@ -11,14 +11,14 @@ from aiogram.dispatcher import FSMContext
 
 from settings import LOGO, ADMIN
 from src.business.channel_subscription.check_subscription import ChannelSubscriptionChecker
-from src.business.get_forecast.send_forecast_ import send_forecast
 from src.business.text_manager.text_manager import text_manager
 from src.telegram.keyboard.keyboards import Admin_keyb
 from src.telegram.sendler.sendler import Sendler_msg
 
 from src.telegram.bot_core import BotDB
-from src.business.payments.unpaid_notifier import notify_unpaid_if_needed
 from src.utils.logger._logger import logger_msg
+from datetime import datetime
+from src.business.offers.offers_json import parse_id_users
 
 CHANNEL_KEY = 'analytic_chat'
 
@@ -59,23 +59,35 @@ async def get_forecast_call(call: types.CallbackQuery, state: FSMContext):
     user_data = await BotDB.get_user_bu_id_user(id_user)
 
     # Проверка на не оплаченный счёт
-    if await notify_unpaid_if_needed(call):
-        return False
+    # if await notify_unpaid_if_needed(call):
+    #     return False
 
-    keyboard = Admin_keyb().back_main_menu(back)
+    offers = await BotDB.offers.read_by_filter({}) or []
+    now = datetime.utcnow()
+    try:
+        offers = [o for o in offers if (getattr(o, 'expire_at', None) is None) or (getattr(o, 'expire_at') > now)]
+        offers.sort(key=lambda o: getattr(o, 'created_at', now), reverse=True)
+        offer = offers[0] if offers else None
+    except Exception:
+        offer = offers[0] if offers else None
 
-    forecast_message = await BotDB.user_messages.read_by_filter({})
-
-    # Если прогноз не загружен или пользователь в состояние тчо уже получал прогноз
-    if not forecast_message or user_data.received_forecast:
+    if not offer:
         no_load = await text_manager.get_message('no_load')
-
-        await Sendler_msg.send_msg_call(call, no_load, keyboard)
-
+        await Sendler_msg.send_msg_call(call, no_load, Admin_keyb().back_main_menu(back))
         return True
 
-    res_send = await send_forecast({'message': call.message, "messages": forecast_message})
+    paid_list = parse_id_users(getattr(offer, 'paid_users', None))
+    if str(id_user) in paid_list:
+        no_load = await text_manager.get_message('already_paid_offer')
+        await Sendler_msg.send_msg_call(call, no_load, Admin_keyb().back_main_menu(back))
+        return True
 
-    res_update_user = await BotDB.edit_user('received_forecast', True, id_user)
+    _msg_from_users = await text_manager.get_message('offer_send')
+    get_offer_btn = await text_manager.get_button_text('get_offer')
+    _msg_from_users = (_msg_from_users or '').format(summa=getattr(offer, 'summa', 0))
+
+    keyboard = Admin_keyb().offers_client(offer_id=offer.id_pk, get_offer_btn=get_offer_btn)
+
+    await Sendler_msg.send_msg_call(call, _msg_from_users, keyboard)
 
     return True
