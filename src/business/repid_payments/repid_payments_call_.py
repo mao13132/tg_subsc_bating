@@ -34,7 +34,7 @@ async def repid_payments_call(call: types.CallbackQuery, state: FSMContext):
 
     if not offer:
         keyboard = Admin_keyb().bet_keyboard()
-        _msg = await text_manager.get_message('no_load')
+        _msg = f'❌ Актуальных предложений в боте нет'
         await Sendler_msg.send_msg_message(call.message, _msg, keyboard)
         return True
 
@@ -71,7 +71,7 @@ async def repid_payments_call(call: types.CallbackQuery, state: FSMContext):
     keyboard = Admin_keyb().bet_keyboard()
     _msg = (
         f"✅ Повторная рассылка предложений завершена\n"
-        f"Всего должников: {total}\n"
+        f"Подписанных пользователей: {total}\n"
         f"Уже оплатили: {already_paid}\n"
         f"Отправлено: {sent}\n"
         f"Ошибки отправки: {failed}"
