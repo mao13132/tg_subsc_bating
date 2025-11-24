@@ -46,7 +46,7 @@ async def start_one(message: Message, state: FSMContext, skip_btn_menu=True):
     await Sendler_msg.log_client_message(message)
 
     # Проверка на не оплаченный счёт
-    if await notify_unpaid_if_needed(message, access_admin=True):
+    if await notify_unpaid_if_needed(message, access_admin=access_admin):
         return False
 
     get_forecast_btn = await text_manager.get_button_text('get_forecast')
