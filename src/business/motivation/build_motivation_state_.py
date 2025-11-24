@@ -46,14 +46,16 @@ async def build_motivation_state(message: Message, state: FSMContext):
     _msg_from_users = (_msg_from_users or '').format(summa=summa)
 
     # 4) Получение аудитории
-    users = await BotDB.get_users_subscribed() or []
+    users = await BotDB.get_users_by_filter(filters={})
     total = len(users)
     sent = 0
     failed = 0
     ok_ids = []
 
     # 5) рассылка оффера
-    for uid in users:
+    for user_data in users:
+        uid = user_data.id_user
+
         keyboard = Admin_keyb().offers_client(get_offer_btn=get_offer_btn)
         try:
             # 5) отправка и попытка закрепить сообщение
