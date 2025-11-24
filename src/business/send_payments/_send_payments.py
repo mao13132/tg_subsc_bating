@@ -65,4 +65,4 @@ async def send_payments(settings):
             pass
 
     # 5) Возвращаем краткий итог
-    return {"total": len(users), "sent": sent, "failed": failed}
+    return {"total": len(users), "sent": sent, "failed": failed, "ok_ids": ok_ids}

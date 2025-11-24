@@ -289,6 +289,21 @@ class BotDB:
             logger_msg(error_)
             return False
 
+    async def set_need_paid_for_ids(self, user_ids: list, value: bool = True):
+        try:
+            if not user_ids:
+                return True
+            async with self.async_session_maker() as session:
+                ids_str = [str(uid) for uid in user_ids]
+                query = update(Users).where(Users.id_user.in_(ids_str)).values(need_paid=value)
+                await session.execute(query)
+                await session.commit()
+                return True
+        except Exception as es:
+            error_ = f'SQL set_need_paid_for_ids: "{es}"'
+            logger_msg(error_)
+            return False
+
     async def get_all_users(self):
         try:
             async with self.async_session_maker() as session:
