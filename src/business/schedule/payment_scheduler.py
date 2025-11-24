@@ -146,8 +146,7 @@ async def check_expired_messages_once() -> int:
             try:
                 text = (
                     f"🗑 Автоудаление:\n"
-                    f"• прогнозов: {int(deleted_msgs or 0)}\n"
-                    f"• предложений: {int(deleted_offers or 0)}"
+                    f"• прогнозов: {int(deleted_offers or 0)}"
                 )
                 await Sendler_msg.sendler_to_admin_mute_bot(bot, text, None)
             except Exception as es:
