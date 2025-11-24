@@ -61,7 +61,7 @@ async def start_one(message: Message, state: FSMContext, skip_btn_menu=True):
 
     if not skip_btn_menu:
         reply_keyb = ReplyKeyboardMarkup(resize_keyboard=True)
-        reply_keyb.add(KeyboardButton('ПОЛУЧИТЬ ПРОГНОЗ🌎🫷🏻'), KeyboardButton('Задать вопрос'))
+        reply_keyb.add(KeyboardButton('ПОЛУЧИТЬ ПРОГНОЗ'), KeyboardButton('Задать вопрос'))
         await message.bot.send_message(id_user, 'Меню', reply_markup=reply_keyb, disable_web_page_preview=True, protect_content=True)
 
     return True

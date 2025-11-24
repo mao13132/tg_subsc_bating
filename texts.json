@@ -18,6 +18,7 @@
     "motivation_send": "Получить прогноз на {summa}? Жмите \uD83D\uDC47",
     "offer_send": "Новый прогноз загружен. Вы можете его приобрести за {summa}.",
     "already_paid_offer": "Актуальный прогноз уже у вас",
-    "replacement": "Текст замены"
+    "replacement": "Текст замены",
+    "contact": "<b>Любой вопрос о работе бота, возможным неисправностям, поможет решить менеджер:\n\n<a href='https://t.me/GorshokMonet'>@GorshokMonet</a>\n\nРежим работы:</b> без выходных с 06:00 до 00:00 по Москве \uD83D\uDC68\u200D\uD83D\uDCBB"
   }
 }

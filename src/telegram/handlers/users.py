@@ -4,6 +4,7 @@ from aiogram.types import Message
 from aiogram import Dispatcher
 
 from settings import ADMIN
+from src.business.get_contact.get_contact_hanlder_ import get_contact_handler
 from src.business.get_forecast.get_forecast_handler_ import get_forecast_handler
 from src.business.managers.check_manager import check_manager
 from src.business.managers.delete_managers import delete_managers
@@ -32,6 +33,8 @@ def register_user(dp: Dispatcher):
 
     dp.register_message_handler(delete_managers, text_contains='/dels_')
 
-    dp.register_message_handler(get_forecast_handler, text_contains='ПОЛУЧИТЬ ПРОГНОЗ')
+    dp.register_message_handler(get_forecast_handler, text_contains='ПОЛУЧИТЬ ПРОГНОЗ', state='*')
+
+    dp.register_message_handler(get_contact_handler, text_contains='Задать вопрос', state='*')
 
     dp.register_message_handler(start, text_contains='')
