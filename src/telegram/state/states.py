@@ -7,6 +7,7 @@ from src.business.logo.logo_states import EditLogoStates
 from src.business.logo.change_logo_state_ import change_logo_state
 from src.business.chat_admin.add_chat_admin_state_ import add_chat_admin_state
 from src.business.managers.add_manager_state import add_manager_state
+from src.business.motivation.build_motivation_state_ import build_motivation_state
 from src.business.posts_manager.posts_state_ import posts_state
 from src.business.posts_manager.posts_states import PostsStates
 from src.business.send_payments.send_payments_state_ import send_payments_state
@@ -27,6 +28,8 @@ def register_state(dp: Dispatcher):
     dp.register_message_handler(get_summa_forecast_state, state=States.get_summa_forecast)
 
     dp.register_message_handler(get_timer_bet_state, state=States.get_timer_bet)
+
+    dp.register_message_handler(build_motivation_state, state=States.get_summa_motivation)
 
     dp.register_message_handler(change_logo_state, state=EditLogoStates.chane_logo, content_types=['photo'])
 

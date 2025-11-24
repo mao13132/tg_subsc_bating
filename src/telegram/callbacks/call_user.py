@@ -4,7 +4,7 @@ from aiogram.dispatcher import FSMContext
 from src.business.bet_menu.bet_menu_call_ import bet_menu_call
 from src.business.bet_menu.clear_bet.clear_bet_call_ import clear_bet_call
 from src.business.bet_menu.send_me_bet.send_me_bet_call_ import send_me_bet_call
-from src.business.bet_menu.set_bet.add_summa_bet_call_ import add_summa_bet_call
+from src.business.bet_menu.set_bet.add_timer_bet_call_ import add_time_bet_call
 from src.business.bet_menu.set_bet.set_bet_call_ import set_bet_call
 from src.business.chat_admin.add_chat_admin_call_ import add_chat_admin_call
 from src.business.chat_admin.chat_admin_call_ import chat_admin_call
@@ -14,12 +14,14 @@ from src.business.logo.logo_change_call_ import logo_change_call
 from src.business.managers.add_managers_call import add_managers_call
 from src.business.managers.check_manager import check_manager
 from src.business.managers.managers_call import managers_call
-from src.business.repid_payments.repid_payments_call_ import repid_payments_call
+from src.business.motivation.build_motivation_call_ import build_motivation_call
+from src.business.repid_motivations.repid_motivations_call_ import repid_motivations_call
 from src.business.send_forecast.approve_forecast_call_ import approve_forecast_call
 from src.business.send_forecast.send_forecast_call_ import send_forecast_call
 from src.business.send_payments.approve_summa_call_ import approve_summa_call
 from src.business.bet_menu.set_bet.finish_timer_bet_call_ import finish_timer_bet_call
 from src.business.send_payments.send_payments_call_ import send_payments_call
+from src.business.payments.repeat_old_payments_call_ import repeat_old_payments_call
 from src.business.start_one.start_one import start_one
 from src.business.text_edit.edit_text_call import edit_text_button_call, edit_text_message_call
 from src.business.text_edit.text_keyboards_call import text_keyboards_call
@@ -30,6 +32,7 @@ from src.telegram.keyboard.keyboards import *
 from src.business.broadcast_any.broadcast_call_ import broadcast_any_call
 from src.business.broadcast_any.broadcast_send_call_ import broadcast_send_call
 from src.business.broadcast_any.broadcast_clear_call_ import broadcast_clear_call
+from src.business.users_stats.users_stats_call_ import users_stats_call
 
 
 async def over_state(call: types.CallbackQuery, state: FSMContext):
@@ -84,7 +87,8 @@ def register_callbacks(dp: Dispatcher):
 
     dp.register_callback_query_handler(set_bet_call, text='set_bet', state='*')
 
-    dp.register_callback_query_handler(add_summa_bet_call, text='send_user_messages', state='*')
+    dp.register_callback_query_handler(add_time_bet_call, text='send_user_messages', state='*')
+    # dp.register_callback_query_handler(add_summa_bet_call, text='send_user_messages', state='*')
 
     dp.register_callback_query_handler(broadcast_any_call, text='broadcast_any', state='*')
     dp.register_callback_query_handler(broadcast_send_call, text='broadcast_send', state='*')
@@ -95,6 +99,8 @@ def register_callbacks(dp: Dispatcher):
     dp.register_callback_query_handler(send_me_bet_call, text='send_me_bet', state='*')
 
     dp.register_callback_query_handler(send_payments_call, text='send_payments', state='*')
+    dp.register_callback_query_handler(repeat_old_payments_call, text='repeat_old_payments', state='*')
+    dp.register_callback_query_handler(users_stats_call, text='users_stats', state='*')
 
     dp.register_callback_query_handler(approve_summa_call, text='approve_summa', state='*')
     dp.register_callback_query_handler(finish_timer_bet_call, text='approve_timer_bet', state='*')
@@ -103,6 +109,8 @@ def register_callbacks(dp: Dispatcher):
 
     dp.register_callback_query_handler(approve_forecast_call, text='approve_forecast', state='*')
 
-    dp.register_callback_query_handler(repid_payments_call, text='repid_payments', state='*')
+    dp.register_callback_query_handler(repid_motivations_call, text='repid_motivations', state='*')
 
     dp.register_callback_query_handler(get_offer_call, text_contains='get_offer-', state='*')
+
+    dp.register_callback_query_handler(build_motivation_call, text='motivation', state='*')

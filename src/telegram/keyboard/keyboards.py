@@ -25,6 +25,8 @@ class Admin_keyb:
 
         self._start_key.add(InlineKeyboardButton(text=f'📣 Рассылка сообщений (всем)', callback_data='broadcast_any'))
 
+        self._start_key.add(InlineKeyboardButton(text=f'📊 Статистика пользователей', callback_data='users_stats'))
+
         self._start_key.add(InlineKeyboardButton(text=f'🗂️ Настройка каналов', callback_data='chat_admin_call'))
 
         self._start_key.add(InlineKeyboardButton(text=f'✏️ Текста кнопок', callback_data='text_keyboards'))
@@ -48,7 +50,11 @@ class Admin_keyb:
 
         self._start_key.add(InlineKeyboardButton(text=f'✅ Выслать счета', callback_data='send_payments'))
 
-        self._start_key.add(InlineKeyboardButton(text=f'♻️ Повторить предложения', callback_data='repid_payments'))
+        self._start_key.add(InlineKeyboardButton(text=f'♻️ Повторить счета (должники)', callback_data='repeat_old_payments'))
+
+        self._start_key.add(InlineKeyboardButton(text=f'⚡️ Создать предложение', callback_data='motivation'))
+
+        self._start_key.add(InlineKeyboardButton(text=f'♻️ Повторить предложения (старое)', callback_data='repid_motivations'))
 
         self._start_key.add(InlineKeyboardButton(text=f'🏚 Домой', callback_data='admin_panel'))
 
@@ -137,10 +143,10 @@ class Admin_keyb:
 
         return self._start_key
 
-    def offers_client(self, offer_id: int, get_offer_btn: str, back_text='', back_callback=''):
+    def offers_client(self, get_offer_btn: str, back_text='', back_callback=''):
         self._start_key = InlineKeyboardMarkup(row_width=1)
 
-        self._start_key.add(InlineKeyboardButton(text=get_offer_btn, callback_data=f'get_offer-{offer_id}'))
+        self._start_key.add(InlineKeyboardButton(text=get_offer_btn, callback_data=f'get_forecast'))
 
         if back_text:
             self._start_key.add(InlineKeyboardButton(text=back_text, callback_data=back_callback))

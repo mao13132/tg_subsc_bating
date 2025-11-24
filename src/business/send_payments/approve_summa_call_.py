@@ -55,10 +55,6 @@ async def approve_summa_call(call: types.CallbackQuery, state: FSMContext):
                                                           reply_markup=keyb_forecast,
                                                           disable_web_page_preview=True,
                                                           protect_content=True)
-                try:
-                    await call.message.bot.pin_chat_message(chat_id=int(uid), message_id=res['message_id'])
-                except:
-                    pass
                 sent += 1
             except:
                 failed += 1

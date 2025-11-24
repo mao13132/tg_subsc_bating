@@ -20,6 +20,8 @@ class States(StatesGroup):
 
     get_timer_bet = State()
 
+    get_summa_motivation = State()
+
 
 class EditTextState(StatesGroup):
     waiting_new_text = State()
@@ -49,7 +51,7 @@ LOGO = r'src/telegram/media/logo.jpg'
 
 LOGGER = True
 
-MOKE_SCHEDULE_PAYMENTS_TASK = False
+MOKE_SCHEDULE_PAYMENTS_TASK = True
 
 CHECK_PAYMENT_EVERY = 30
 

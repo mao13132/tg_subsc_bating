@@ -2,7 +2,6 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from settings import LOGO
-from src.business.text_manager.text_manager import text_manager
 from src.telegram.keyboard.keyboards import Admin_keyb
 from src.telegram.sendler.sendler import Sendler_msg
 from src.telegram.bot_core import BotDB
@@ -36,8 +35,8 @@ async def finish_timer_bet_call(call: types.CallbackQuery, state: FSMContext):
     dt_str = data.get('timer_bet_dt_str')
 
     # 3. Очистка чужих партий текущего пользователя
-    if batch_key:
-        await BotDB.user_messages.delete_not_batch_key(id_user, batch_key)
+    await BotDB.user_messages.delete_not_batch_key(id_user, batch_key)
+    await BotDB.offers.delete_all()
 
     # 4. Проставляем срок удаления для партийных сообщений
     if dt_iso:
@@ -77,43 +76,36 @@ async def finish_timer_bet_call(call: types.CallbackQuery, state: FSMContext):
 
     offer_id = await BotDB.offers.create(offer_data)
 
-    # 9. Получаем текст шаблона предложения и кнопку
-    _msg_from_users = await text_manager.get_message('offer_send')
+    # 9. Получаем аудиторию — все кто нажал получить прогноз
+    audience_ids = await BotDB.get_users_by_filter(filters={'wants_forecast': True, 'is_subs': True, 'need_paid': False})
 
-    get_offer_btn = await text_manager.get_button_text('get_offer')
-
-    _msg_from_users = _msg_from_users.format(summa=summa)
-
-    # 10. Получаем аудиторию — все подписаны
-    audience_ids = await BotDB.get_users_subscribed() or []
-
-    # 11. Рассылаем текст аудитории
+    # 10. Рассылаем контент оффера аудитории
     ok_ids = await send_offer_to_audience({
         "message": call.message,
-        "text": _msg_from_users,
         "audience_ids": audience_ids,
-        "get_offer_btn": get_offer_btn,
         "offer_id": offer_id,
     })
 
-    # 12. Сохраняем ID успешных получателей в Offer
+    # 11. Сохраняем ID успешных получателей в Offer
     ids_json = add_id_users(None, ok_ids)
     await BotDB.offers.update_by_id(int(offer_id), {"id_users": ids_json})
+
+    await BotDB.edit_user_by_filter({'wants_forecast': True}, {'wants_forecast': False, 'received_forecast': True})
 
     total = len(audience_ids)
     sent = len(ok_ids)
     failed = max(total - sent, 0)
 
-    # 13. Готовим сводку администратору
+    # 12. Готовим сводку администратору
     summary_msg = (
-        f'✅ Предложение разослано\n'
-        f'Пользователей: {total}\n'
+        f'✅ Прогноз разослан\n'
+        f'Пользователей кто нажал "получить прогноз": {total}\n'
         f'Успешных доставок: {sent}\n'
         f'Ошибки: {failed}\n'
         f'🗓 Дата удаления прогноза: {dt_str or "не задана"}'
     )
 
-    # 14. Отдаём сводку и клавиатуру
+    # 13. Отдаём сводку и клавиатуру
     keyboard = Admin_keyb().bet_keyboard()
 
     await Sendler_msg.send_msg_call(call, summary_msg, keyboard)

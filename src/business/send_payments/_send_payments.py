@@ -26,6 +26,7 @@ async def send_payments(settings):
 
     # 4) Рассылка по ID пользователей
     sent, failed = 0, 0
+    ok_ids = []
     for user in users:
         uid = user.id_user
 
@@ -49,12 +50,19 @@ async def send_payments(settings):
 
         if res:
             sent += 1
+            ok_ids.append(str(uid))
         else:
             failed += 1
 
         await record_payment(uid, summa, reg_pay_num, link_payment, 'sent' if res else 'failed')
 
         continue
+
+    if ok_ids:
+        try:
+            await BotDB.set_send_payments_for_ids(ok_ids, True)
+        except Exception:
+            pass
 
     # 5) Возвращаем краткий итог
     return {"total": len(users), "sent": sent, "failed": failed}

@@ -8,7 +8,7 @@
 # ---------------------------------------------
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, select, insert, update, delete, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, select, insert, update, delete, Boolean, DateTime, func, case
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -16,7 +16,7 @@ from settings import SQL_URL, Base
 from src.sql.texts import TextsCRUD
 from src.sql.user_messages import UserMessageCRUD
 from src.sql.payments import PaymentsCRUD
-from src.sql.offers import OffersCRUD
+from src.sql.offers import OffersCRUD, MotivationsCRUD
 from src.utils.logger._logger import logger_msg
 from src.utils.telegram_debug import SendlerOneCreate
 
@@ -47,6 +47,8 @@ class Users(Base):
     is_subs = Column(Boolean, nullable=False, default=False)
 
     send_payments = Column(Boolean, nullable=False, default=False)
+
+    wants_forecast = Column(Boolean, nullable=False, default=False, comment=f'Нажал кнопку получить прогноз')
 
     other = Column(String, nullable=True)
 
@@ -90,6 +92,8 @@ class BotDB:
 
             # Инициализируем CRUD для предложений
             self.offers = OffersCRUD(self.async_session_maker)
+            # Инициализируем CRUD для мотивационных рассылок
+            self.motivations = MotivationsCRUD(self.async_session_maker)
         except Exception as es:
             error_ = f'SQL не могу создать подключение "{es}"'
 
@@ -243,6 +247,18 @@ class BotDB:
             logger_msg(error_)
             return False
 
+    async def edit_user_by_filter(self, filters: dict, values: dict):
+        try:
+            async with self.async_session_maker() as session:
+                query = update(Users).filter_by(**filters).values(**values)
+                await session.execute(query)
+                await session.commit()
+                return True
+        except Exception as es:
+            error_ = f'SQL edit_user_by_filter: "{es}"'
+            logger_msg(error_)
+            return False
+
     async def set_received_forecast_for_ids(self, user_ids: list, value: bool = True):
         try:
             if not user_ids:
@@ -255,6 +271,21 @@ class BotDB:
                 return True
         except Exception as es:
             error_ = f'SQL set_received_forecast_for_ids: "{es}"'
+            logger_msg(error_)
+            return False
+
+    async def set_send_payments_for_ids(self, user_ids: list, value: bool = True):
+        try:
+            if not user_ids:
+                return True
+            async with self.async_session_maker() as session:
+                ids_str = [str(uid) for uid in user_ids]
+                query = update(Users).where(Users.id_user.in_(ids_str)).values(send_payments=value)
+                await session.execute(query)
+                await session.commit()
+                return True
+        except Exception as es:
+            error_ = f'SQL set_send_payments_for_ids: "{es}"'
             logger_msg(error_)
             return False
 
@@ -294,6 +325,17 @@ class BotDB:
             logger_msg(error_msg)
             return []
 
+    async def get_users_by_filter(self, filters: dict):
+        try:
+            async with self.async_session_maker() as session:
+                query = select(Users).filter_by(**filters)
+                result = await session.execute(query)
+                return result.scalars().all()
+        except Exception as es:
+            error_ = f'SQL get_users_by_filter: "{es}"'
+            logger_msg(error_)
+            return []
+
     async def init_bases(self):
         try:
             async with self.engine.begin() as conn:
@@ -310,6 +352,39 @@ class BotDB:
             await SendlerOneCreate().send_message(error_)
 
             return False
+
+    async def get_users_stats(self):
+        try:
+            async with self.async_session_maker() as session:
+                query = select(
+                    func.count(Users.id_pk).label('total'),
+                    func.sum(case((Users.is_subs == True, 1), else_=0)).label('is_subs'),
+                    func.sum(case((Users.need_paid == True, 1), else_=0)).label('need_paid'),
+                    func.sum(case((Users.send_payments == True, 1), else_=0)).label('send_payments'),
+                    func.sum(case((Users.received_forecast == True, 1), else_=0)).label('received_forecast'),
+                    func.sum(case((Users.wants_forecast == True, 1), else_=0)).label('wants_forecast')
+                )
+                response = await session.execute(query)
+                row = response.mappings().first() or {}
+                return {
+                    'total': int(row.get('total', 0) or 0),
+                    'is_subs': int(row.get('is_subs', 0) or 0),
+                    'need_paid': int(row.get('need_paid', 0) or 0),
+                    'send_payments': int(row.get('send_payments', 0) or 0),
+                    'received_forecast': int(row.get('received_forecast', 0) or 0),
+                    'wants_forecast': int(row.get('wants_forecast', 0) or 0),
+                }
+        except Exception as es:
+            error_ = f'SQL get_users_stats: "{es}"'
+            logger_msg(error_)
+            return {
+                'total': 0,
+                'is_subs': 0,
+                'need_paid': 0,
+                'send_payments': 0,
+                'received_forecast': 0,
+                'wants_forecast': 0,
+            }
 
     async def get_user_bu_id_user(self, id_user):
 
