@@ -33,8 +33,8 @@ def register_user(dp: Dispatcher):
 
     dp.register_message_handler(delete_managers, text_contains='/dels_')
 
-    dp.register_message_handler(get_forecast_handler, text_contains='ПОЛУЧИТЬ ПРОГНОЗ', state='*')
+    dp.register_message_handler(get_forecast_handler, text_contains='ПОЛУЧИТЬ ПРОГНОЗ')
 
-    dp.register_message_handler(get_contact_handler, text_contains='Задать вопрос', state='*')
+    dp.register_message_handler(get_contact_handler, text_contains='Задать вопрос')
 
     dp.register_message_handler(start, text_contains='')
