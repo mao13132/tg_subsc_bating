@@ -45,13 +45,15 @@ SECKEY = os.getenv('SECKEY')
 
 DOMAIN_PAYMENT = os.getenv('DOMAIN_PAYMENT')
 
+SERVCODE = os.getenv('SERVCODE')
+
 SQL_URL = os.getenv('SQL_URL')
 
 LOGO = r'src/telegram/media/logo.jpg'
 
 LOGGER = True
 
-MOKE_SCHEDULE_PAYMENTS_TASK = True
+MOKE_SCHEDULE_PAYMENTS_TASK = False
 
 CHECK_PAYMENT_EVERY = 30
 

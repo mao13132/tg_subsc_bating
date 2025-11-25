@@ -20,6 +20,7 @@ from src.business.text_manager.text_manager import text_manager
 from src.telegram.sendler.sendler import Sendler_msg
 from src.business.offers.send_offer_content import send_offer_content_to_user
 from src.business.offers.offers_json import add_id_user
+from src.business.schedule.payment_admin_notify import send_admin_payment_info
 
 
 async def check_payments_once() -> int:
@@ -104,6 +105,10 @@ async def check_payments_once() -> int:
                             logger_msg(f"Ошибка записи оплатившего в Offer {offer_id}: {e}")
 
                     processed_ok += 1
+                    try:
+                        await send_admin_payment_info(bot, p, norm)
+                    except Exception as e:
+                        logger_msg(f"Ошибка уведомления админов об оплате {pid}: {e}")
                     continue
 
                 if kind == 'negative' and norm in ("rejected", "refunded", "error", "created_error"):

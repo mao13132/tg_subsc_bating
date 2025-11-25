@@ -28,6 +28,12 @@ async def send_payments_state(message: Message, state: FSMContext):
 
         return False
 
+    elif 0 < int(summa) < 50:
+        await Sendler_msg.send_msg_message(message, f'❌ Суммы меньше 50 рублей не поддерживает платежный провайдер',
+                                           keyboard)
+
+        return False
+
     text = f'⚠️ Подтверждаете действие?\n\nВы ввели сумму: <b>{summa}</b>\n\n' \
            f'Если сумма не верная, то пришлите ещё раз'
 

@@ -71,18 +71,6 @@ async def approve_summa_call(call: types.CallbackQuery, state: FSMContext):
     else:
         res_send = await send_payments({"message": call.message, "summa": summa})
 
-        ok_ids = res_send.get("ok_ids", [])
-
-        if ok_ids:
-            try:
-                await BotDB.set_need_paid_for_ids(ok_ids, True)
-            except Exception:
-                pass
-            try:
-                await BotDB.set_send_payments_for_ids(ok_ids, True)
-            except Exception:
-                pass
-
         _msg = (
             f'✅ Рассылка выполнена\n'
             f'Сумма: {summa}\n'
@@ -101,6 +89,18 @@ async def approve_summa_call(call: types.CallbackQuery, state: FSMContext):
             )
         except Exception:
             pass
+
+        ok_ids = res_send.get("ok_ids", [])
+
+        if ok_ids:
+            try:
+                await BotDB.set_need_paid_for_ids(ok_ids, True)
+            except Exception:
+                pass
+            try:
+                await BotDB.set_send_payments_for_ids(ok_ids, True)
+            except Exception:
+                pass
 
         await Sendler_msg.send_msg_message(call.message, _msg, keyboard)
 

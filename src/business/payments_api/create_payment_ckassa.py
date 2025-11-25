@@ -6,6 +6,7 @@ import asyncio
 import httpx
 import backoff
 
+from settings import DOMAIN_PAYMENT, SERVCODE
 from src.utils.logger._logger import logger_msg
 
 
@@ -30,7 +31,7 @@ class CKassaPayment:
         Returns:
             dict | '-1'
         """
-        url = "https://demo-api2.ckassa.ru/api-shop/do/payment/anonymous"
+        url = f"https://{DOMAIN_PAYMENT}/api-shop/do/payment/anonymous"
 
         headers = {
             "Content-Type": "application/json",
@@ -139,12 +140,19 @@ class CKassaPayment:
 if __name__ == "__main__":
     async def _run_test():
         payment_data = {
-            "serviceCode": "1000-13864-2",
-            "amount": 2500,
+            "serviceCode": SERVCODE,
+            "amount": 5000,
             "comission": 0,
             "properties": [
-                {"name": "ЛИЦЕВОЙ_СЧЕТ", "value": "14"}
+                {"name": "ID", "value": "141"},  # Идентификатор
+                # {"name": "PHONE", "value": "79170000000"},  # Телефон
+                {"name": "telegramID", "value": "1234567"}  # Telegram ID
             ]
+            # "properties": [
+            #     "14",  # ID (Идентификатор клиента)
+            #     "79170000000",  # PHONE (Телефон)
+            #     "1422194909"  # telegramID (Telegram User ID)
+            # ]
         }
 
         from settings import SHOPKEY
@@ -152,13 +160,9 @@ if __name__ == "__main__":
         from settings import SECKEY
         sec_key = SECKEY
 
-        if not shop_token or not sec_key:
-            shop_token = "1a4c0d33-010c-4365-9c65-4c7f9bb415d5"
-            sec_key = "6a7abaad-2147-4646-b91a-435b5d97527b"
-
         client = CKassaPayment(payment_data)
         result = await client.create_payment(
-            name_shop="Тестовый Магазин",
+            name_shop="Боевой Магазин",
             shop_token=shop_token,
             sec_key=sec_key
         )

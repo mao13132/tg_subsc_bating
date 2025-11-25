@@ -22,7 +22,8 @@ async def create_ckassa_payment(uid: str, amount_rub: int,
         "amount": int(amount_kop),
         "comission": 0,
         "properties": [
-            {"name": "ЛИЦЕВОЙ_СЧЕТ", "value": str(uid)}
+            {"name": "ID", "value": str(uid)},
+            {"name": "telegramID", "value": str(uid)},
         ]
     }
 

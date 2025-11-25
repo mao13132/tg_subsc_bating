@@ -5,7 +5,6 @@
 # Комментарии и документация — компактные, но информативные.
 
 import asyncio
-import os
 import httpx
 import backoff
 
@@ -147,10 +146,12 @@ class CKassaPaymentChecker:
 
 if __name__ == "__main__":
     async def _run_test():
-        shop_token = "1a4c0d33-010c-4365-9c65-4c7f9bb415d5"
-        sec_key = "6a7abaad-2147-4646-b91a-435b5d97527b"
+        from settings import SHOPKEY
+        shop_token = SHOPKEY
+        from settings import SECKEY
+        sec_key = SECKEY
 
-        regPayNum = '536354'
+        regPayNum = '202050095'
 
         checker = CKassaPaymentChecker()
         result = await checker.check_payment(

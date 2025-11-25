@@ -6,6 +6,7 @@
 # 1.0       2023    Initial Version
 #
 # ---------------------------------------------
+from settings import SERVCODE
 from src.business.text_manager.text_manager import text_manager
 from src.telegram.bot_core import BotDB
 from src.telegram.keyboard.keyboards import Admin_keyb
@@ -17,7 +18,7 @@ async def send_payments(settings):
     message = settings['message']
 
     name_shop = 'Основной Магазин'
-    service_code = '1000-13864-2'
+    service_code = SERVCODE
 
     template = await text_manager.get_message('send_payment')
     btn_text = await text_manager.get_button_text('paid')
@@ -35,7 +36,7 @@ async def send_payments(settings):
             link_payment = created['payUrl']
             reg_pay_num = created['regPayNum']
         except Exception:
-            continue
+            failed += 1
 
         keyboard = Admin_keyb().payment_keyb(btn_text, link_payment)
 
