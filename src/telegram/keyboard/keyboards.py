@@ -50,11 +50,11 @@ class Admin_keyb:
 
         self._start_key.add(InlineKeyboardButton(text=f'✅ Выслать счета', callback_data='send_payments'))
 
-        self._start_key.add(InlineKeyboardButton(text=f'♻️ Повторить счета (должники)', callback_data='repeat_old_payments'))
+        # self._start_key.add(InlineKeyboardButton(text=f'♻️ Повторить счета (должники)', callback_data='repeat_old_payments'))
 
         self._start_key.add(InlineKeyboardButton(text=f'⚡️ Создать предложение', callback_data='motivation'))
 
-        self._start_key.add(InlineKeyboardButton(text=f'♻️ Повторить предложения (старое)', callback_data='repid_motivations'))
+        # self._start_key.add(InlineKeyboardButton(text=f'♻️ Повторить предложения (старое)', callback_data='repid_motivations'))
 
         self._start_key.add(InlineKeyboardButton(text=f'🏚 Домой', callback_data='admin_panel'))
 

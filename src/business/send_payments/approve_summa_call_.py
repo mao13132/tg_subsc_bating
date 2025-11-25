@@ -15,6 +15,7 @@ from src.telegram.keyboard.keyboards import Admin_keyb
 from src.telegram.sendler.sendler import Sendler_msg
 from src.telegram.bot_core import BotDB
 from src.business.text_manager.text_manager import text_manager
+from src.business.payments.repeat_old_payments_call_ import repeat_old_payments_for_debtors
 
 
 async def approve_summa_call(call: types.CallbackQuery, state: FSMContext):
@@ -82,8 +83,24 @@ async def approve_summa_call(call: types.CallbackQuery, state: FSMContext):
             except Exception:
                 pass
 
-        _msg = f'✅ Рассылка выполнена\nСумма: {summa}\nПользователей: {res_send["sent"]}\n' \
-               f'Успешных доставок:{res_send["total"]}\nОшибки: {res_send["failed"]}'
+        _msg = (
+            f'✅ Рассылка выполнена\n'
+            f'Сумма: {summa}\n'
+            f'Пользователей: {res_send["sent"]}\n'
+            f'Успешных доставок:{res_send["total"]}\n'
+            f'Ошибки: {res_send["failed"]}'
+        )
+
+        try:
+            res_repeat = await repeat_old_payments_for_debtors(call.message.bot)
+            _msg += (
+                f'\n\n♻️ Повтор счетов должникам\n'
+                f'Должники: {res_repeat["total"]}\n'
+                f'Отправлено: {res_repeat["sent"]}\n'
+                f'Ошибки отправки: {res_repeat["failed"]}'
+            )
+        except Exception:
+            pass
 
         await Sendler_msg.send_msg_message(call.message, _msg, keyboard)
 
