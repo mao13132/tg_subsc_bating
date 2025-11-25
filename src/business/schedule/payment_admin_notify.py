@@ -1,9 +1,13 @@
+from settings import SEND_SUCCESS_PAYMENTS
 from src.telegram.bot_core import BotDB
 from src.telegram.sendler.sendler import Sendler_msg
 from src.utils.logger._logger import logger_msg
 
 
 async def send_admin_payment_info(bot, payment, norm_status: str) -> bool:
+    if not SEND_SUCCESS_PAYMENTS:
+        return False
+
     try:
         uid = getattr(payment, 'id_user', None)
         pid = getattr(payment, 'id_pk', None)
