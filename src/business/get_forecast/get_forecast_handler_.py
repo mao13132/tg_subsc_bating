@@ -19,6 +19,7 @@ from src.utils.logger._logger import logger_msg
 from datetime import datetime
 from src.business.offers.offers_json import parse_id_users, add_id_user
 from src.business.offers.send_offer_content import send_offer_content_to_user
+from src.business.payments.payment_service import ensure_payment_link
 
 CHANNEL_KEY = 'analytic_chat'
 
@@ -47,6 +48,23 @@ async def get_forecast_handler(message: Message, state: FSMContext):
 
     # 2) Идентификаторы пользователя и канала
     id_user = message.chat.id
+
+    data_user = await BotDB.get_user_bu_id_user(id_user)
+
+    if data_user.need_paid:
+        template = await text_manager.get_message('no_paid_msg')
+        btn_text = await text_manager.get_button_text('paid')
+        result = await ensure_payment_link(str(id_user))
+        link_payment = result.get('link')
+        amount = int(result.get('amount') or 0)
+        if link_payment:
+            keyboard = Admin_keyb().payment_keyb(btn_text, link_payment)
+            text_msg = (template or '').format(summa=amount, link=link_payment)
+            await Sendler_msg.send_msg_message(message, text_msg, keyboard)
+            return True
+        else:
+            await Sendler_msg.send_msg_message(message, template or 'Ссылка на оплату недоступна', None)
+            return True
 
     id_channel = await BotDB.get_setting(CHANNEL_KEY)
 
