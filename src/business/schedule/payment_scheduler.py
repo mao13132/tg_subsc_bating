@@ -147,6 +147,11 @@ async def check_expired_messages_once() -> int:
             deleted_offers = await BotDB.offers.delete_expired(before)
         except Exception as es:
             logger_msg(f"Delete expired offers error: {es}")
+        deleted_motivations = 0
+        try:
+            deleted_motivations = await BotDB.motivations.delete_all()
+        except Exception as es:
+            logger_msg(f"Delete motivations error: {es}")
 
         if (deleted_msgs or 0) > 0 or (deleted_offers or 0) > 0:
             try:
@@ -158,7 +163,7 @@ async def check_expired_messages_once() -> int:
             except Exception as es:
                 logger_msg(f"Notify admin about expired deletion error: {es}")
 
-        return int((deleted_msgs or 0) + (deleted_offers or 0))
+        return int((deleted_msgs or 0) + (deleted_offers or 0) + (deleted_motivations or 0))
     except Exception as e:
         logger_msg(f"Delete expired messages/offers error: {e}")
         return 0
