@@ -127,9 +127,8 @@ async def get_forecast_handler(message: Message, state: FSMContext):
         motivation = motivations[0] if motivations else None
 
     if not motivation:
-        error_ = f'К сожалению на данный момент нет предложений'
-
-        await Sendler_msg.send_msg_message(message, error_, Admin_keyb().back_main_menu(back))
+        no_load = await text_manager.get_message('no_load')
+        await Sendler_msg.send_msg_message(message, no_load, Admin_keyb().back_main_menu(back))
 
         return False
 

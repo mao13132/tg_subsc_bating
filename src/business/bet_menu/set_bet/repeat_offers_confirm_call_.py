@@ -25,6 +25,15 @@ async def repeat_offers_confirm_call(call: types.CallbackQuery, state: FSMContex
 
     summa = state_data.get('summa', False)
 
+    motivations = await BotDB.motivations.read_by_filter({}) or []
+    if not motivations:
+        try:
+            await BotDB.motivations.create({"summa": int(summa)})
+        except Exception as es:
+            logger_msg(f"Create motivation error: {es}")
+        await finish_timer_bet_call(call, state)
+        return True
+
     await state.update_data(resend_motivation=response)
 
     # Идёт вветку переотправки, там же обновим сумму
