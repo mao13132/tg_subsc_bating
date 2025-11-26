@@ -20,6 +20,10 @@ class States(StatesGroup):
 
     get_timer_bet = State()
 
+    get_summa_offer = State()
+
+    confirm_repeat_offers = State()
+
     get_summa_motivation = State()
 
 
@@ -53,7 +57,9 @@ LOGO = r'src/telegram/media/logo.jpg'
 
 LOGGER = True
 
-MOKE_SCHEDULE_PAYMENTS_TASK = True
+MOKE_SCHEDULE = False
+
+MOKE_SCHEDULE_PAYMENTS_TASK = False
 
 SEND_SUCCESS_PAYMENTS = False
 

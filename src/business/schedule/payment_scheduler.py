@@ -11,7 +11,7 @@ import asyncio
 from datetime import datetime, timedelta
 from typing import Optional, List
 
-from settings import SHOPKEY, SECKEY, CHECK_PAYMENT_EVERY
+from settings import SHOPKEY, SECKEY, CHECK_PAYMENT_EVERY, MOKE_SCHEDULE_PAYMENTS_TASK
 from src.telegram.keyboard.keyboards import Admin_keyb
 from src.utils.logger._logger import logger_msg
 from src.telegram.bot_core import BotDB, bot
@@ -21,6 +21,7 @@ from src.telegram.sendler.sendler import Sendler_msg
 from src.business.offers.send_offer_content import send_offer_content_to_user
 from src.business.offers.offers_json import add_id_user
 from src.business.schedule.payment_admin_notify import send_admin_payment_info
+from src.business.offers.send_latest_offer_to_waiting_users import send_latest_offer_to_waiting_users
 
 
 async def check_payments_once() -> int:
@@ -210,13 +211,36 @@ class PaymentScheduler:
             print("🔄 Запуск цикла автоматической проверки платежей")
             while self.is_running:
                 try:
-                    count_pay = await check_payments_once()
-                    if count_pay > 0:
-                        print(f"✅ Обработано оплаченных платежей: {count_pay}")
+                    tasks = []
+                    idx_pay = None
+                    if not MOKE_SCHEDULE_PAYMENTS_TASK:
+                        idx_pay = len(tasks)
+                        tasks.append(check_payments_once())
+                    idx_exp = len(tasks)
+                    tasks.append(check_expired_messages_once())
+                    idx_offer = len(tasks)
+                    tasks.append(send_latest_offer_to_waiting_users())
 
-                    count_exp = await check_expired_messages_once()
-                    if count_exp > 0:
-                        print(f"🧹 Удалено просроченных сообщений: {count_exp}")
+                    results = await asyncio.gather(*tasks, return_exceptions=True)
+
+                    count_pay = 0 if idx_pay is None else results[idx_pay]
+                    count_exp = results[idx_exp]
+                    sent_offer = results[idx_offer]
+
+                    if isinstance(count_pay, Exception):
+                        logger_msg(f"❌ Ошибка одноразовой проверки платежей: {count_pay}")
+                    elif (count_pay or 0) > 0:
+                        print(f"✅ Обработано оплаченных платежей: {int(count_pay)}")
+
+                    if isinstance(count_exp, Exception):
+                        logger_msg(f"❌ Ошибка одноразовой очистки просроченных: {count_exp}")
+                    elif (count_exp or 0) > 0:
+                        print(f"🧹 Удалено просроченных сообщений: {int(count_exp)}")
+
+                    if isinstance(sent_offer, Exception):
+                        logger_msg(f"❌ Ошибка рассылки свежего оффера: {sent_offer}")
+                    elif sent_offer:
+                        print("📨 Свежий оффер отправлен ожидающим пользователям")
                     await asyncio.sleep(CHECK_PAYMENT_EVERY)
                 except asyncio.CancelledError:
                     logger_msg("🛑 Цикл проверки платежей отменен")

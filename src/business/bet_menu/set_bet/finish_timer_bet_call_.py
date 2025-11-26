@@ -1,7 +1,6 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from settings import LOGO
 from src.telegram.keyboard.keyboards import Admin_keyb
 from src.telegram.sendler.sendler import Sendler_msg
 from src.telegram.bot_core import BotDB
@@ -9,7 +8,6 @@ from datetime import datetime
 from src.business.send_offer._send_offer import send_offer_to_audience
 from src.business.offers.offers_json import add_id_users
 import json
-from types import SimpleNamespace
 
 
 async def finish_timer_bet_call(call: types.CallbackQuery, state: FSMContext):
@@ -33,6 +31,8 @@ async def finish_timer_bet_call(call: types.CallbackQuery, state: FSMContext):
     summa = data.get('summa')
     dt_iso = data.get('timer_bet_dt_iso')
     dt_str = data.get('timer_bet_dt_str')
+
+    resend_motivation = data.get('resend_motivation')
 
     # 3. Очистка чужих партий текущего пользователя
     await BotDB.user_messages.delete_not_batch_key(id_user, batch_key)
@@ -76,8 +76,8 @@ async def finish_timer_bet_call(call: types.CallbackQuery, state: FSMContext):
 
     offer_id = await BotDB.offers.create(offer_data)
 
-    # 9. Получаем аудиторию — все кто нажал получить прогноз
-    audience_ids = await BotDB.get_users_by_filter(filters={'wants_forecast': True, 'is_subs': True, 'need_paid': False})
+    # 9. Получаем аудиторию — все кто нажал получить прогноз в ПРЕДЛОЖЕНИЕ
+    audience_ids = await BotDB.get_users_by_filter(filters={'get_offer': True, 'is_subs': True, 'need_paid': False})
 
     # 10. Рассылаем контент оффера аудитории
     ok_ids = await send_offer_to_audience({
@@ -90,7 +90,7 @@ async def finish_timer_bet_call(call: types.CallbackQuery, state: FSMContext):
     ids_json = add_id_users(None, ok_ids)
     await BotDB.offers.update_by_id(int(offer_id), {"id_users": ids_json})
 
-    await BotDB.edit_user_by_filter({'wants_forecast': True}, {'wants_forecast': False, 'received_forecast': True})
+    await BotDB.edit_user_by_filter({'get_offer': True}, {'get_offer': False, 'received_forecast': True})
 
     total = len(audience_ids)
     sent = len(ok_ids)
@@ -99,7 +99,7 @@ async def finish_timer_bet_call(call: types.CallbackQuery, state: FSMContext):
     # 12. Готовим сводку администратору
     summary_msg = (
         f'✅ Прогноз разослан\n'
-        f'Пользователей кто нажал "получить прогноз": {total}\n'
+        f'Пользователей кто нажал "получить прогноз" в предложение: {total}\n'
         f'Успешных доставок: {sent}\n'
         f'Ошибки: {failed}\n'
         f'🗓 Дата удаления прогноза: {dt_str or "не задана"}'
@@ -108,6 +108,9 @@ async def finish_timer_bet_call(call: types.CallbackQuery, state: FSMContext):
     # 13. Отдаём сводку и клавиатуру
     keyboard = Admin_keyb().bet_keyboard()
 
-    await Sendler_msg.send_msg_call(call, summary_msg, keyboard)
+    if str(resend_motivation) == 'yes':
+        await Sendler_msg().new_sender_message_call(call, summary_msg, keyboard)
+    else:
+        await Sendler_msg.send_msg_call(call, summary_msg, keyboard)
 
     return True

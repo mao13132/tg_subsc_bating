@@ -42,13 +42,16 @@ class Users(Base):
 
     need_paid = Column(Boolean, nullable=False, default=False)
 
-    received_forecast = Column(Boolean, nullable=False, default=False, comment=f'Получал ли пользователь последний прогноз')
+    received_forecast = Column(Boolean, nullable=False, default=False,
+                               comment=f'Получал ли пользователь последний прогноз')
 
     is_subs = Column(Boolean, nullable=False, default=False)
 
     send_payments = Column(Boolean, nullable=False, default=False)
 
     wants_forecast = Column(Boolean, nullable=False, default=False, comment=f'Нажал кнопку получить прогноз')
+
+    get_offer = Column(Boolean, default=False, nullable=True, comment=f'Кто нажал кнопку на предложение')
 
     other = Column(String, nullable=True)
 
@@ -319,7 +322,7 @@ class BotDB:
     async def get_users_subscribed(self):
         try:
             async with self.async_session_maker() as session:
-                query = select(Users.id_user).where(Users.is_subs == True)
+                query = select(Users).where(Users.is_subs == True)
                 response = await session.execute(query)
                 result = [row[0] for row in response.all()] if response else []
                 return result

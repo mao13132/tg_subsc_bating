@@ -18,7 +18,6 @@ from src.telegram.bot_core import BotDB
 from src.utils.logger._logger import logger_msg
 from datetime import datetime
 from src.business.offers.offers_json import parse_id_users, add_id_user
-from src.business.offers.send_offer_content import send_offer_content_to_user
 from src.business.payments.payment_service import ensure_payment_link
 
 CHANNEL_KEY = 'analytic_chat'
@@ -111,30 +110,60 @@ async def get_forecast_handler(message: Message, state: FSMContext):
     except Exception:
         offer = offers[0] if offers else None
 
-    # 8) Нет оффера — сообщаем и выходим
-    if not offer:
-        no_load = await text_manager.get_message('no_load')
-        await Sendler_msg.send_msg_message(message, no_load, Admin_keyb().back_main_menu(back))
-        return True
-
     # 9) Пользователь уже получал прогноз — сообщаем и выходим
-    sends_list = parse_id_users(getattr(offer, 'id_users', None))
-    if str(id_user) in sends_list:
-        no_load = await text_manager.get_message('already_paid_offer')
-        await Sendler_msg.send_msg_message(message, no_load, Admin_keyb().back_main_menu(back))
-        return True
+    if offers:
+        sends_list = parse_id_users(getattr(offer, 'id_users', None))
+        if str(id_user) in sends_list:
+            no_load = await text_manager.get_message('already_paid_offer')
+            await Sendler_msg.send_msg_message(message, no_load, Admin_keyb().back_main_menu(back))
+            return True
 
-    sent_ok = await send_offer_content_to_user(message.bot, int(id_user), int(getattr(offer, 'id_pk', 0)))
-    if sent_ok:
-        ids_json = add_id_user(getattr(offer, 'id_users', None), id_user)
-        await BotDB.offers.update_by_id(int(getattr(offer, 'id_pk', 0)), {"id_users": ids_json})
+    motivations = await BotDB.motivations.read_by_filter({}) or []
+    now = datetime.utcnow()
+    try:
+        motivations.sort(key=lambda m: getattr(m, 'created_at', now), reverse=True)
+        motivation = motivations[0] if motivations else None
+    except Exception:
+        motivation = motivations[0] if motivations else None
+
+    if not motivation:
+        error_ = f'К сожалению на данный момент нет предложений'
+
+        await Sendler_msg.send_msg_message(message, error_, Admin_keyb().back_main_menu(back))
+
+        return False
+
+    tpl = await text_manager.get_message('motivation_main_text')
+    text_out = (tpl or '').format(summa=int(getattr(motivation, 'summa', 0) or 0))
+
+    user_get_offer = data_user.get_offer
+
+    get_offer_btn = await text_manager.get_button_text('get_motivation')
+
+    await Sendler_msg.send_msg_message(message, text_out, Admin_keyb().actual_motivation(back, get_offer_btn, user_get_offer))
+
+    try:
+        ids_json = add_id_user(getattr(motivation, 'id_users', None), id_user)
+        await BotDB.motivations.update_by_id(int(getattr(motivation, 'id_pk')), {"id_users": ids_json})
+    except Exception:
+        pass
 
     try:
         await message.delete()
     except:
         pass
 
-    await BotDB.edit_user('wants_forecast', False, id_user)
-    await BotDB.edit_user('received_forecast', True, id_user)
+    # sent_ok = await send_offer_content_to_user(message.bot, int(id_user), int(getattr(offer, 'id_pk', 0)))
+    # if sent_ok:
+    #     ids_json = add_id_user(getattr(offer, 'id_users', None), id_user)
+    #     await BotDB.offers.update_by_id(int(getattr(offer, 'id_pk', 0)), {"id_users": ids_json})
+    #
+    # try:
+    #     await message.delete()
+    # except:
+    #     pass
+
+    # await BotDB.edit_user('wants_forecast', False, id_user)
+    # await BotDB.edit_user('received_forecast', True, id_user)
 
     return True

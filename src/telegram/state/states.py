@@ -3,6 +3,7 @@ from aiogram import Dispatcher, types
 from settings import States, EditTextState
 from src.business.bet_menu.set_bet.get_summa_forecast_state_ import get_summa_forecast_state
 from src.business.bet_menu.set_bet.get_timer_bet_state_ import get_timer_bet_state
+from src.business.bet_menu.set_bet.get_summa_offer_state_ import get_summa_offer_state
 from src.business.logo.logo_states import EditLogoStates
 from src.business.logo.change_logo_state_ import change_logo_state
 from src.business.chat_admin.add_chat_admin_state_ import add_chat_admin_state
@@ -28,6 +29,8 @@ def register_state(dp: Dispatcher):
     dp.register_message_handler(get_summa_forecast_state, state=States.get_summa_forecast)
 
     dp.register_message_handler(get_timer_bet_state, state=States.get_timer_bet)
+
+    dp.register_message_handler(get_summa_offer_state, state=States.get_summa_offer)
 
     dp.register_message_handler(build_motivation_state, state=States.get_summa_motivation)
 

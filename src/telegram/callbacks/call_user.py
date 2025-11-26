@@ -1,5 +1,6 @@
 from aiogram import Dispatcher
 from aiogram.dispatcher import FSMContext
+from settings import States
 
 from src.business.bet_menu.bet_menu_call_ import bet_menu_call
 from src.business.bet_menu.clear_bet.clear_bet_call_ import clear_bet_call
@@ -10,6 +11,7 @@ from src.business.chat_admin.add_chat_admin_call_ import add_chat_admin_call
 from src.business.chat_admin.chat_admin_call_ import chat_admin_call
 from src.business.get_forecast.get_forecast_call_ import get_forecast_call
 from src.business.get_offer.get_offer_call_ import get_offer_call
+from src.business.get_offer_client.get_offer_client_call_ import get_offer_client_call
 from src.business.logo.logo_change_call_ import logo_change_call
 from src.business.managers.add_managers_call import add_managers_call
 from src.business.managers.check_manager import check_manager
@@ -20,6 +22,8 @@ from src.business.send_forecast.approve_forecast_call_ import approve_forecast_c
 from src.business.send_forecast.send_forecast_call_ import send_forecast_call
 from src.business.send_payments.approve_summa_call_ import approve_summa_call
 from src.business.bet_menu.set_bet.finish_timer_bet_call_ import finish_timer_bet_call
+from src.business.bet_menu.set_bet.start_summa_offer_call_ import start_summa_offer_call
+from src.business.bet_menu.set_bet.repeat_offers_confirm_call_ import repeat_offers_confirm_call
 from src.business.send_payments.send_payments_call_ import send_payments_call
 from src.business.payments.repeat_old_payments_call_ import repeat_old_payments_call
 from src.business.start_one.start_one import start_one
@@ -103,13 +107,17 @@ def register_callbacks(dp: Dispatcher):
     dp.register_callback_query_handler(users_stats_call, text='users_stats', state='*')
 
     dp.register_callback_query_handler(approve_summa_call, text='approve_summa', state='*')
-    dp.register_callback_query_handler(finish_timer_bet_call, text='approve_timer_bet', state='*')
+    dp.register_callback_query_handler(start_summa_offer_call, text='approve_timer_bet', state='*')
 
     dp.register_callback_query_handler(send_forecast_call, text='send_forecast', state='*')
 
     dp.register_callback_query_handler(approve_forecast_call, text='approve_forecast', state='*')
 
     dp.register_callback_query_handler(repid_motivations_call, text='repid_motivations', state='*')
+
+    dp.register_callback_query_handler(repeat_offers_confirm_call, text_contains='repeat_offers', state=States.confirm_repeat_offers)
+
+    dp.register_callback_query_handler(get_offer_client_call, text='get_offer_client', state='*')
 
     dp.register_callback_query_handler(get_offer_call, text_contains='get_offer-', state='*')
 

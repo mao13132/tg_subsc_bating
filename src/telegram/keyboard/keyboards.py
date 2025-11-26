@@ -107,8 +107,32 @@ class Admin_keyb:
 
         return self._start_key
 
+    def repeat_offers_confirm(self):
+        self._start_key = InlineKeyboardMarkup(row_width=2)
+
+        self._start_key.add(
+            InlineKeyboardButton(text='✅ Да', callback_data='repeat_offers-yes'),
+            InlineKeyboardButton(text='❌ Нет', callback_data='repeat_offers-no'),
+        )
+
+        self._start_key.add(InlineKeyboardButton(text=f'🔙 Назад', callback_data='bet_menu'))
+
+        self._start_key.add(InlineKeyboardButton(text=f'🏚 Домой', callback_data='admin_panel'))
+
+        return self._start_key
+
     def back_main_menu(self, back_text):
         self._start_key = InlineKeyboardMarkup(row_width=1)
+
+        self._start_key.add(InlineKeyboardButton(text=back_text, callback_data='over_state'))
+
+        return self._start_key
+
+    def actual_motivation(self, back_text, get_offer_btn, user_get_offer):
+        self._start_key = InlineKeyboardMarkup(row_width=1)
+
+        if not user_get_offer:
+            self._start_key.add(InlineKeyboardButton(text=get_offer_btn, callback_data='get_offer_client'))
 
         self._start_key.add(InlineKeyboardButton(text=back_text, callback_data='over_state'))
 
@@ -146,7 +170,7 @@ class Admin_keyb:
     def offers_client(self, get_offer_btn: str, back_text='', back_callback=''):
         self._start_key = InlineKeyboardMarkup(row_width=1)
 
-        self._start_key.add(InlineKeyboardButton(text=get_offer_btn, callback_data=f'get_forecast'))
+        self._start_key.add(InlineKeyboardButton(text=get_offer_btn, callback_data=f'get_offer_client'))
 
         if back_text:
             self._start_key.add(InlineKeyboardButton(text=back_text, callback_data=back_callback))

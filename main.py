@@ -1,6 +1,6 @@
 import asyncio
 
-from settings import MOKE_SCHEDULE_PAYMENTS_TASK
+from settings import MOKE_SCHEDULE
 from src.business.start_sql_data.start_sql_data import start_sql_data
 from src.telegram.bot_core import *
 from src.telegram.handlers.users import *
@@ -35,13 +35,13 @@ async def main():
     registration_state(bot_start.dp)
     registration_calls(bot_start.dp)
 
-    if not MOKE_SCHEDULE_PAYMENTS_TASK:
+    if not MOKE_SCHEDULE:
         await start_payment_scheduler()
 
     try:
         await bot_start.dp.start_polling()
     finally:
-        if not MOKE_SCHEDULE_PAYMENTS_TASK:
+        if not MOKE_SCHEDULE:
             await stop_payment_scheduler()
         await bot_start.dp.storage.close()
         await bot_start.dp.storage.wait_closed()

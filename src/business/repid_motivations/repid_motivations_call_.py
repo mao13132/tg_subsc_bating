@@ -17,11 +17,9 @@ from src.utils.logger._logger import logger_msg
 from datetime import datetime
 
 
-async def repid_motivations_call(call: types.CallbackQuery, state: FSMContext):
+async def repid_motivations_call(call: types.CallbackQuery, state: FSMContext,
+                                 resend_from_create_offer=False, new_summa=False):
     await Sendler_msg.log_client_call(call)
-
-    # 1) сброс FSM
-    await state.finish()
 
     motivations = await BotDB.motivations.read_by_filter({}) or []
     try:
@@ -39,10 +37,28 @@ async def repid_motivations_call(call: types.CallbackQuery, state: FSMContext):
     # 3) текст сообщения и кнопка
     _msg_from_users = await text_manager.get_message('motivation_send')
     get_offer_btn = await text_manager.get_button_text('get_motivation')
-    _msg_from_users = (_msg_from_users or '').format(summa=getattr(motivation, 'summa', 0))
+
+    # Если передана, новая сумма, то вставляем её, если нет, то от последнего предложения
+    if new_summa:
+        _msg_from_users = (_msg_from_users or '').format(summa=int(new_summa))
+        try:
+            current_summa = int(getattr(motivation, 'summa', 0))
+            if int(new_summa) != int(current_summa):
+                await BotDB.motivations.update_by_id(int(getattr(motivation, 'id_pk')), {"summa": int(new_summa)})
+        except Exception:
+            pass
+    else:
+        _msg_from_users = (_msg_from_users or '').format(summa=getattr(motivation, 'summa', 0))
 
     # 4) подписчики
-    users = await BotDB.get_users_subscribed() or []
+    # Если переотправка при создание офера, то отправляем только тем кто не соглашался ещё на предложение
+    if resend_from_create_offer:
+        msg_ = ' + не нажавшие кнопку ранее'
+        users = await BotDB.get_users_by_filter(filters={'get_offer': False})
+    else:
+        msg_ = ''
+        users = await BotDB.get_users_by_filter(filters={})
+
     total = len(users)
     sent = 0
     failed = 0
@@ -50,7 +66,9 @@ async def repid_motivations_call(call: types.CallbackQuery, state: FSMContext):
     ok_ids = []
 
     # 5) рассылка оффера
-    for uid in users:
+    for user_data in users:
+        uid = user_data.id_user
+
         keyboard = Admin_keyb().offers_client(get_offer_btn=get_offer_btn)
         try:
             # 5) отправка и попытка закрепить сообщение
@@ -71,11 +89,16 @@ async def repid_motivations_call(call: types.CallbackQuery, state: FSMContext):
 
     # 6) итоговый отчёт администратору
     keyboard = Admin_keyb().bet_keyboard()
+
     _msg = (
         f"✅ Повторная рассылка предложений завершена\n"
-        f"Подписанных (на группу) пользователей: {total}\n"
+        f"Подписанных{msg_} (на группу) пользователей: {total}\n"
         f"Отправлено: {sent}\n"
         f"Ошибки отправки: {failed}"
     )
+
+    if resend_from_create_offer:
+        keyboard = None
+
     await Sendler_msg.send_msg_message(call.message, _msg, keyboard)
     return True

@@ -6,6 +6,7 @@ from settings import SHOPKEY, SECKEY
 from src.utils.logger._logger import logger_msg
 from src.telegram.bot_core import BotDB
 from src.business.payments_api.create_payment_ckassa import CKassaPayment
+from src.business.payments_api.order_best_before import order_best_before
 
 
 async def create_ckassa_payment(uid: str, amount_rub: int,
@@ -21,6 +22,7 @@ async def create_ckassa_payment(uid: str, amount_rub: int,
         "serviceCode": service_code,
         "amount": int(amount_kop),
         "comission": 0,
+        "orderBestBefore": order_best_before(),
         "properties": [
             {"name": "ID", "value": str(uid)},
             {"name": "telegramID", "value": str(uid)},
