@@ -42,9 +42,13 @@ async def approve_summa_call(call: types.CallbackQuery, state: FSMContext):
         pass
 
     if str(summa) == '0':
+        admin_link = await text_manager.get_button_text('admin_link')
+
+        admin_text = await text_manager.get_button_text('admin_text')
+
         replacement_text = await text_manager.get_message('replacement')
         get_forecast_btn = await text_manager.get_button_text('get_forecast')
-        keyb_forecast = Admin_keyb().forecast_call_keyb(get_forecast_btn)
+        keyb_forecast = Admin_keyb().forecast_call_keyb(get_forecast_btn, admin_text, admin_link)
 
         users = await BotDB.users_read_by_filter({'is_subs': True}) or []
         sent = 0

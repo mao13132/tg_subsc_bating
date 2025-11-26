@@ -31,7 +31,17 @@ async def create_ckassa_payment(uid: str, amount_rub: int,
 
     try:
         res = await CKassaPayment(payment_data).create_payment(name_shop, SHOPKEY, SECKEY)
-        return {"regPayNum": res["regPayNum"], "payUrl": res["payUrl"]}
+
+        try:
+            response = {"regPayNum": res["regPayNum"], "payUrl": res["payUrl"]}
+        except Exception as es:
+            error_ = f'Ошибка при проверки платежа "{es}"'
+
+            logger_msg(error_)
+
+            return False
+
+        return response
     except Exception as e:
         logger_msg(f"CKassa: ошибка создания платежа для {uid}: {e}\n"
                    f"{''.join(traceback.format_exception(sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2]))}")

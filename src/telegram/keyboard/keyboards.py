@@ -186,8 +186,10 @@ class Admin_keyb:
 
         return self._start_key
 
-    def forecast_call_keyb(self, get_forecast_btn: str):
+    def forecast_call_keyb(self, get_forecast_btn: str, admin_text, admin_link):
         self._start_key = InlineKeyboardMarkup(row_width=1)
+
+        self._start_key.add(InlineKeyboardButton(text=admin_text, url=admin_link))
 
         self._start_key.add(InlineKeyboardButton(text=get_forecast_btn, callback_data='get_forecast'))
 

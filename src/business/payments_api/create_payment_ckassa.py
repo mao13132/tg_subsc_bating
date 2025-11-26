@@ -78,7 +78,7 @@ class CKassaPayment:
 
         if messages:
             msg = " | ".join(messages)
-            logger_msg(f"CKassa Error: {msg}")
+            logger_msg(f"CKassa Error: {msg} '{str(self.payment_data)}'")
 
             low = msg.lower()
             if "limit" in low or "too many" in low or "unknown error" in low:
