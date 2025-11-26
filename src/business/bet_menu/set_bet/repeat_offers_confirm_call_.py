@@ -31,8 +31,6 @@ async def repeat_offers_confirm_call(call: types.CallbackQuery, state: FSMContex
             await BotDB.motivations.create({"summa": int(summa)})
         except Exception as es:
             logger_msg(f"Create motivation error: {es}")
-        await finish_timer_bet_call(call, state)
-        return True
 
     await state.update_data(resend_motivation=response)
 

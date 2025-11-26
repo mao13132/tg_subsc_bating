@@ -20,10 +20,12 @@ async def clear_bet_call(call: types.CallbackQuery, state: FSMContext):
     await state.finish()
 
     res_clear = await BotDB.user_messages.delete_by_filter({})
+    await BotDB.offers.delete_all()
+    await BotDB.motivations.delete_all()
 
     keyboard = Admin_keyb().bet_keyboard()
 
-    _msg = f'✅ Успешно очистил загруженный прогноз'
+    _msg = f'✅ Успешно очистил загруженный прогноз и предложения'
 
     await Sendler_msg.send_msg_call(call, _msg, keyboard)
 
