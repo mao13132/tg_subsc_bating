@@ -83,7 +83,7 @@ def register_callbacks(dp: Dispatcher):
 
     dp.register_callback_query_handler(chat_admin_call, text='chat_admin_call', state='*')
 
-    dp.register_callback_query_handler(get_forecast_call, text='get_forecast', state='*')
+    dp.register_callback_query_handler(get_forecast_call, text_contains='get_forecast', state='*')
 
     dp.register_callback_query_handler(logo_change_call, text='logo_change_call', state='*')
 
