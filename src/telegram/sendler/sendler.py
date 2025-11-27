@@ -195,6 +195,16 @@ class Sendler_msg:
 
         return res_send
 
+    async def new_send_msg_message(message: Message, text_msg, keyb):
+        try:
+            res_send = await message.bot.send_message(message.chat.id, text_msg,
+                                                      reply_markup=keyb, disable_web_page_preview=True,
+                                                      protect_content=True)
+
+            return res_send
+        except:
+            return False
+
     async def send_call_message(call: types.CallbackQuery, text_msg, keyb):
         res_send = False
         if call.message.photo != []:

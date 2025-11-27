@@ -20,7 +20,7 @@ from src.business.offers.offers_json import parse_id_users, add_id_user
 from src.business.access_checks import check_need_paid, ensure_subscription
 
 
-async def get_forecast_handler(message: Message, state: FSMContext):
+async def get_forecast_handler(message: Message, state: FSMContext, new_msg=False):
     """
     Обрабатывает нажатие «Получить прогноз».
 
@@ -73,7 +73,10 @@ async def get_forecast_handler(message: Message, state: FSMContext):
         sends_list = parse_id_users(getattr(offer, 'id_users', None))
         if str(id_user) in sends_list:
             no_load = await text_manager.get_message('already_paid_offer')
-            await Sendler_msg.send_msg_message(message, no_load, Admin_keyb().back_main_menu(back))
+            if new_msg:
+                await Sendler_msg.new_send_msg_message(message, no_load, Admin_keyb().back_main_menu(back))
+            else:
+                await Sendler_msg.send_msg_message(message, no_load, Admin_keyb().back_main_menu(back))
             return True
 
     motivations = await BotDB.motivations.read_by_filter({}) or []
@@ -86,7 +89,10 @@ async def get_forecast_handler(message: Message, state: FSMContext):
 
     if not motivation:
         no_load = await text_manager.get_message('no_load')
-        await Sendler_msg.send_msg_message(message, no_load, Admin_keyb().back_main_menu(back))
+        if new_msg:
+            await Sendler_msg.new_send_msg_message(message, no_load, Admin_keyb().back_main_menu(back))
+        else:
+            await Sendler_msg.send_msg_message(message, no_load, Admin_keyb().back_main_menu(back))
 
         return False
 
@@ -97,7 +103,10 @@ async def get_forecast_handler(message: Message, state: FSMContext):
 
     get_offer_btn = await text_manager.get_button_text('get_motivation')
 
-    await Sendler_msg.send_msg_message(message, text_out, Admin_keyb().actual_motivation(back, get_offer_btn, user_get_offer))
+    if new_msg:
+        await Sendler_msg.new_send_msg_message(message, text_out, Admin_keyb().actual_motivation(back, get_offer_btn, user_get_offer))
+    else:
+        await Sendler_msg.send_msg_message(message, text_out, Admin_keyb().actual_motivation(back, get_offer_btn, user_get_offer))
 
     try:
         ids_json = add_id_user(getattr(motivation, 'id_users', None), id_user)
@@ -109,18 +118,5 @@ async def get_forecast_handler(message: Message, state: FSMContext):
         await message.delete()
     except:
         pass
-
-    # sent_ok = await send_offer_content_to_user(message.bot, int(id_user), int(getattr(offer, 'id_pk', 0)))
-    # if sent_ok:
-    #     ids_json = add_id_user(getattr(offer, 'id_users', None), id_user)
-    #     await BotDB.offers.update_by_id(int(getattr(offer, 'id_pk', 0)), {"id_users": ids_json})
-    #
-    # try:
-    #     await message.delete()
-    # except:
-    #     pass
-
-    # await BotDB.edit_user('wants_forecast', False, id_user)
-    # await BotDB.edit_user('received_forecast', True, id_user)
 
     return True

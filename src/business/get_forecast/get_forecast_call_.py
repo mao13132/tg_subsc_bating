@@ -16,4 +16,4 @@ from src.telegram.sendler.sendler import Sendler_msg
 async def get_forecast_call(call: types.CallbackQuery, state: FSMContext):
     await Sendler_msg.log_client_call(call)
 
-    return await get_forecast_handler(call.message, state)
+    return await get_forecast_handler(call.message, state, new_msg=True)
