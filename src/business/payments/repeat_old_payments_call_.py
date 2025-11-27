@@ -15,6 +15,10 @@ async def repeat_old_payments_for_debtors(bot):
     template = await text_manager.get_message('send_payment')
     btn_text = await text_manager.get_button_text('paid')
 
+    admin_link = await text_manager.get_button_text('admin_link')
+
+    admin_text = await text_manager.get_button_text('admin_text')
+
     total = len(users)
     sent = 0
     failed = 0
@@ -37,7 +41,7 @@ async def repeat_old_payments_for_debtors(bot):
             failed += 1
             continue
 
-        keyboard = Admin_keyb().payment_keyb(btn_text, link_payment)
+        keyboard = Admin_keyb().payment_keyb(btn_text, link_payment, admin_text=admin_text, admin_link=admin_link)
 
         client_message = (template or '').format(summa=amount, link=f"<a href='{link_payment}'>Оплатить</a>")
 
