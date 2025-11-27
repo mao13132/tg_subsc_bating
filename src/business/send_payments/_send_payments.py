@@ -25,6 +25,10 @@ async def send_payments(settings):
 
     users = await BotDB.users_read_by_filter(filters={'is_subs': True, 'send_payments': False}) or []
 
+    admin_link = await text_manager.get_button_text('admin_link')
+
+    admin_text = await text_manager.get_button_text('admin_text')
+
     # 4) Рассылка по ID пользователей
     sent, failed = 0, 0
     ok_ids = []
@@ -38,7 +42,7 @@ async def send_payments(settings):
         except Exception:
             failed += 1
 
-        keyboard = Admin_keyb().payment_keyb(btn_text, link_payment)
+        keyboard = Admin_keyb().payment_keyb(btn_text, link_payment, admin_text, admin_link)
 
         client_message = template.format(summa=summa, link=f"<a href='{link_payment}'>Оплатить</a>")
 

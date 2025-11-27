@@ -149,8 +149,10 @@ class Admin_keyb:
 
         return self._start_key
 
-    def payment_keyb(self, btn_text, client_payment_link):
+    def payment_keyb(self, btn_text, client_payment_link, admin_text, admin_link):
         self._start_key = InlineKeyboardMarkup(row_width=1)
+
+        self._start_key.add(InlineKeyboardButton(text=admin_text, url=admin_link))
 
         self._start_key.add(InlineKeyboardButton(text=btn_text, url=client_payment_link))
 
