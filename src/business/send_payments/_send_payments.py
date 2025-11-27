@@ -42,6 +42,8 @@ async def send_payments(settings):
         except Exception:
             failed += 1
 
+            continue
+
         keyboard = Admin_keyb().payment_keyb(btn_text, link_payment, admin_text, admin_link)
 
         client_message = template.format(summa=summa, link=f"<a href='{link_payment}'>Оплатить</a>")
