@@ -9,7 +9,6 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message
 
-from src.business.channel_subscription.check_subscription import ChannelSubscriptionChecker
 from src.business.text_manager.text_manager import text_manager
 from src.telegram.keyboard.keyboards import Admin_keyb
 from src.telegram.sendler.sendler import Sendler_msg
@@ -18,9 +17,7 @@ from src.telegram.bot_core import BotDB
 from src.utils.logger._logger import logger_msg
 from datetime import datetime
 from src.business.offers.offers_json import parse_id_users, add_id_user
-from src.business.payments.payment_service import ensure_payment_link
-
-CHANNEL_KEY = 'analytic_chat'
+from src.business.access_checks import check_need_paid, ensure_subscription
 
 
 async def get_forecast_handler(message: Message, state: FSMContext):
@@ -29,71 +26,32 @@ async def get_forecast_handler(message: Message, state: FSMContext):
 
     Алгоритм:
     1) Логирует событие и завершает текущее FSM-состояние.
-    2) Получает id пользователя и id канала проверки.
-    3) Если канал не задан — уведомляет админа и завершается.
-    4) Проверяет подписку пользователя на канал.
-    5) При отсутствии подписки — информирует пользователя и завершается.
-    6) Отмечает пользователя как подписанного в БД.
-    7) Получает актуальный оффер (не истёкший, самый свежий).
-    8) При отсутствии оффера — отправляет сообщение и завершается.
-    9) Проверяет, что пользователь не числится как оплативший оффер.
-    10) Отправляет упакованный контент оффера пользователю.
-    11) Отправляет сообщение с кнопкой получения оффера.
+    2) Получает id пользователя.
+    3) Проверяет необходимость оплаты (если нужно — отправляет ссылку и завершает).
+    4) Проверяет подписку (если нет — информирует и завершает).
+    5) Отмечает желание клиента получить прогноз.
+    6) Ищет актуальную мотивацию, формирует текст и клавиатуру.
+    7) Отправляет сообщение пользователю и фиксирует его в мотивации.
     """
     # 1) Логирование и завершение состояния
     await Sendler_msg.log_client_message(message)
 
     await state.finish()
 
-    # 2) Идентификаторы пользователя и канала
+    # 2) Идентификатор пользователя
     id_user = message.chat.id
 
     data_user = await BotDB.get_user_bu_id_user(id_user)
 
-    if data_user.need_paid:
-        template = await text_manager.get_message('no_paid_msg')
-        btn_text = await text_manager.get_button_text('paid')
-        result = await ensure_payment_link(str(id_user))
-        link_payment = result.get('link')
-        amount = int(result.get('amount') or 0)
-        if link_payment:
-            keyboard = Admin_keyb().payment_keyb(btn_text, link_payment)
-            text_msg = (template or '').format(summa=amount, link=link_payment)
-            await Sendler_msg.send_msg_message(message, text_msg, keyboard)
-            return True
-        else:
-            await Sendler_msg.send_msg_message(message, template or 'Ссылка на оплату недоступна', None)
-            return True
+    # 3) Проверка необходимости оплаты
+    if await check_need_paid(message):
+        return True
 
-    id_channel = await BotDB.get_setting(CHANNEL_KEY)
-
-    # 3) Нет канала — предупреждение админам и выход
-    if not id_channel:
-        await Sendler_msg.sendler_to_admin_mute(message,
-                                                '❌Не установлен чат, на подписку которого проверяем, '
-                                                'установите его в админ панели', None)
-
+    # 4) Проверка подписки
+    if not await ensure_subscription(message):
         return False
 
-    # 4) Проверка подписки на канал
-    subscription_checker = ChannelSubscriptionChecker(message.bot, id_channel)
-
-    is_subscription = await subscription_checker.is_user_subscribed(id_user)
-
-    # 5) Нет подписки — информируем и выходим
-    if not is_subscription:
-        error_ = await text_manager.get_message('no_subs')
-
-        await Sendler_msg.send_msg_message(message, error_, None)
-
-        logger_msg(f'Пользователь {message.chat.id} без подписки, нажимал кнопку "Получить прогноз"')
-
-        return False
-
-    # 6) Отмечаем пользователя подписанным
-    update_user = await BotDB.edit_user('is_subs', True, id_user)
-
-    # 6.1) Отмечаем желание клиента получить прогноз
+    # 5) Отмечаем желание клиента получить прогноз
     await BotDB.edit_user('wants_forecast', True, id_user)
 
     back = await text_manager.get_button_text('back')
