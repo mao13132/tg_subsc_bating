@@ -6,6 +6,8 @@
 # 1.0       2023    Initial Version
 #
 # ---------------------------------------------
+from datetime import datetime
+
 from aiogram import types
 from aiogram.types import Message
 
@@ -96,6 +98,24 @@ async def check_need_paid(ctx):
             return True
 
         # 3.2*) Ссылка недоступна — отправляем информативное сообщение
+
+        motivations = await BotDB.motivations.read_by_filter({}) or []
+        now = datetime.utcnow()
+        try:
+            motivations.sort(key=lambda m: getattr(m, 'created_at', now), reverse=True)
+            motivation = motivations[0] if motivations else None
+        except Exception:
+            motivation = motivations[0] if motivations else None
+
+        if not motivation:
+            no_load = await text_manager.get_message('no_load')
+            await Sendler_msg.send_msg_message(_ctx_message(ctx), no_load, None)
+
+            return True
+
+        if template:
+            template = (template or '').format(summa=motivation.summa, link=link_payment)
+
         await Sendler_msg.send_msg_message(_ctx_message(ctx), template or 'Ссылка на оплату недоступна', None)
         # 3.3) Остановка дальнейшей обработки
         return True

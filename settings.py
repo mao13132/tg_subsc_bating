@@ -57,7 +57,7 @@ LOGO = r'src/telegram/media/logo.jpg'
 
 LOGGER = True
 
-MOKE_SCHEDULE = False
+MOKE_SCHEDULE = True
 
 MOKE_SCHEDULE_PAYMENTS_TASK = True
 
