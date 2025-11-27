@@ -143,7 +143,9 @@ if __name__ == "__main__":
         payment_data = {
             "serviceCode": SERVCODE,
             "amount": 5000,
-            "orderBestBefore": order_best_before(),
+            # "orderBestBefore": order_best_before(),
+            # "pfPayLink": 'true',
+            "payType": 'sbp',
             "comission": 0,
             "properties": [
                 {"name": "ID", "value": "143"},  # Идентификатор

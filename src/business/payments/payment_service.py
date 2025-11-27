@@ -22,7 +22,8 @@ async def create_ckassa_payment(uid: str, amount_rub: int,
         "serviceCode": service_code,
         "amount": int(amount_kop),
         "comission": 0,
-        "orderBestBefore": order_best_before(),
+        "payType": 'sbp',
+        # "orderBestBefore": order_best_before(),
         "properties": [
             {"name": "ID", "value": str(uid)},
             {"name": "telegramID", "value": str(uid)},
@@ -135,7 +136,8 @@ async def ensure_offer_payment(uid: str,
             }
 
     created = await create_ckassa_payment(str(uid), int(amount_rub), service_code=service_code, name_shop=name_shop)
-    await record_payment(str(uid), int(amount_rub), created['regPayNum'], created['payUrl'], 'created', offer_id=int(offer_id))
+    await record_payment(str(uid), int(amount_rub), created['regPayNum'], created['payUrl'], 'created',
+                         offer_id=int(offer_id))
     return {
         'link': created['payUrl'],
         'amount': int(amount_rub),

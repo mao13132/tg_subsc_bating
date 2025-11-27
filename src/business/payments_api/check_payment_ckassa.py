@@ -151,7 +151,8 @@ if __name__ == "__main__":
         from settings import SECKEY
         sec_key = SECKEY
 
-        regPayNum = '202050095'
+        regPayNum = 'C9F4B6D120C5FC99AAEF059CA7802078'
+        # regPayNum = '202050095'
 
         checker = CKassaPaymentChecker()
         result = await checker.check_payment(
