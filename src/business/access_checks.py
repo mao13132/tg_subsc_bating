@@ -92,7 +92,12 @@ async def check_need_paid(ctx):
         if link_payment:
             # 3.2) Отправка сообщения с кнопкой оплаты
             keyboard = Admin_keyb().payment_keyb(btn_text, link_payment)
-            text_msg = (template or '').format(summa=amount, link=link_payment)
+
+            try:
+                text_msg = (template or '').format(summa=amount, link=link_payment if link_payment else '')
+            except:
+                text_msg = template
+
             await Sendler_msg.send_msg_message(_ctx_message(ctx), text_msg, keyboard)
             # 3.3) Остановка дальнейшей обработки
             return True
@@ -114,7 +119,10 @@ async def check_need_paid(ctx):
             return True
 
         if template:
-            template = (template or '').format(summa=motivation.summa, link=link_payment)
+            try:
+                template = (template or '').format(summa=motivation.summa, link=link_payment)
+            except:
+                pass
 
         await Sendler_msg.send_msg_message(_ctx_message(ctx), template or 'Ссылка на оплату недоступна', None)
         # 3.3) Остановка дальнейшей обработки
@@ -167,4 +175,3 @@ async def ensure_subscription(ctx):
     # 6) Отмечаем подписку в БД
     await BotDB.edit_user('is_subs', True, id_user)
     return True
-    
