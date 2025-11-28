@@ -32,8 +32,8 @@ async def approve_forecast_call(call: types.CallbackQuery, state: FSMContext):
         await Sendler_msg.send_msg_call(call, no_load, keyboard)
         return True
 
-    # Перед рассылкой сбрасываем флаг получения прогноза у целевой аудитории
-    await BotDB.bulk_update_users_by_filter({}, {"received_forecast": False})
+    # Перед рассылкой сбрасываем флаг получения прогноза у целевой аудитории - закоментил
+    # await BotDB.bulk_update_users_by_filter({}, {"received_forecast": False})
 
     res_send = await send_forecast_broadcast({"message": call.message, "messages": forecast_message})
 

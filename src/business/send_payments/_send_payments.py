@@ -23,7 +23,7 @@ async def send_payments(settings):
     template = await text_manager.get_message('send_payment')
     btn_text = await text_manager.get_button_text('paid')
 
-    users = await BotDB.users_read_by_filter(filters={'is_subs': True, 'send_payments': False}) or []
+    users = await BotDB.users_read_by_filter(filters={'is_subs': True, 'send_payments': False, 'received_forecast': True}) or []
 
     admin_link = await text_manager.get_button_text('admin_link')
 

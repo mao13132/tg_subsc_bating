@@ -48,8 +48,8 @@ async def finish_timer_bet_call(call: types.CallbackQuery, state: FSMContext):
     # 5. Завершаем FSM
     await state.finish()
 
-    # 6. Сбрасываем флаг полученного прогноза для всех
-    await BotDB.bulk_update_users_by_filter({}, {"received_forecast": False})
+    # 6. Сбрасываем флаг полученного прогноза для всех - закомментил
+    # await BotDB.bulk_update_users_by_filter({}, {"received_forecast": False})
 
     # 7. Читаем собранные сообщения текущего пользователя
     records = await BotDB.user_messages.read_by_filter({
