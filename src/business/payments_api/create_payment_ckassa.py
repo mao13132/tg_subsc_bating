@@ -138,25 +138,16 @@ class CKassaPayment:
 
 
 if __name__ == "__main__":
-    from src.business.payments_api.order_best_before import order_best_before
     async def _run_test():
         payment_data = {
             "serviceCode": SERVCODE,
             "amount": 5000,
-            # "orderBestBefore": order_best_before(),
-            # "pfPayLink": 'true',
             "payType": 'sbp',
             "comission": 0,
             "properties": [
                 {"name": "ID", "value": "143"},  # Идентификатор
-                # {"name": "PHONE", "value": "79170000000"},  # Телефон
                 {"name": "telegramID", "value": "1234561"}  # Telegram ID
             ]
-            # "properties": [
-            #     "14",  # ID (Идентификатор клиента)
-            #     "79170000000",  # PHONE (Телефон)
-            #     "1422194909"  # telegramID (Telegram User ID)
-            # ]
         }
 
         from settings import SHOPKEY

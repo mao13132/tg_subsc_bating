@@ -28,7 +28,8 @@ async def repeat_offers_confirm_call(call: types.CallbackQuery, state: FSMContex
     motivations = await BotDB.motivations.read_by_filter({}) or []
     if not motivations:
         try:
-            await BotDB.motivations.create({"summa": int(summa)})
+            sum_int = int(str(summa)) if str(summa).isdigit() else 0
+            await BotDB.motivations.create({"summa": sum_int, "id_users": None})
         except Exception as es:
             logger_msg(f"Create motivation error: {es}")
 

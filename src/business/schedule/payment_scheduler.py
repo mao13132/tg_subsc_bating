@@ -11,7 +11,7 @@ import asyncio
 from datetime import datetime, timedelta
 from typing import Optional, List
 
-from settings import SHOPKEY, SECKEY, CHECK_PAYMENT_EVERY, MOKE_SCHEDULE_PAYMENTS_TASK
+from settings import SHOPKEY, SECKEY, CHECK_PAYMENT_EVERY, MOKE_SCHEDULE_PAYMENTS_TASK, PAYMENT_TIMEOUT_MINUTES
 from src.telegram.keyboard.keyboards import Admin_keyb
 from src.utils.logger._logger import logger_msg
 from src.telegram.bot_core import BotDB, bot
@@ -21,7 +21,8 @@ from src.telegram.sendler.sendler import Sendler_msg
 from src.business.offers.send_offer_content import send_offer_content_to_user
 from src.business.offers.offers_json import add_id_user
 from src.business.schedule.payment_admin_notify import send_admin_payment_info
-from src.business.offers.send_latest_offer_to_waiting_users import send_latest_offer_to_waiting_users
+from src.business.schedule.send_latest_offer_to_waiting_users import send_latest_offer_to_waiting_users
+from src.business.schedule.payment_message_revert import revert_payment_messages_once
 
 
 async def check_payments_once() -> int:
@@ -49,7 +50,8 @@ async def check_payments_once() -> int:
         except Exception as e:
             logger_msg(f"SQL: ошибка выборки платежей со статусом '{st}': {e}")
 
-    ttl_seconds = 86400
+    # TTL для жизни счёта: после этого метим как expired и больше не проверяем
+    ttl_seconds = int(PAYMENT_TIMEOUT_MINUTES) * 60
     for p in payments_to_check:
         reg = getattr(p, 'reg_pay_num', None)
         pid = getattr(p, 'id_pk', None)
@@ -57,6 +59,14 @@ async def check_payments_once() -> int:
         created_at = getattr(p, 'created_at', None)
 
         if not reg or not pid:
+            continue
+
+        # Прекращаем проверку слишком старых счетов
+        if created_at and (datetime.utcnow() - created_at).total_seconds() > ttl_seconds:
+            try:
+                await BotDB.payments.update_by_id(pid, {'status': 'expired'})
+            except Exception as e:
+                logger_msg(f"Expire payment {pid} error: {e}")
             continue
 
         try:
@@ -121,8 +131,7 @@ async def check_payments_once() -> int:
                     continue
 
                 if kind == 'pending' and norm == 'created':
-                    if created_at and (datetime.utcnow() - created_at).total_seconds() > ttl_seconds:
-                        await BotDB.payments.update_by_id(pid, {'status': 'expired'})
+                    # created: оставляем как есть, но пометим как expired по TTL в начале цикла
                     continue
 
                 if kind == 'unknown':
@@ -140,14 +149,39 @@ async def check_payments_once() -> int:
 
 async def check_expired_messages_once() -> int:
     try:
-        before = datetime.utcnow() + timedelta(hours=3)
-        deleted_msgs = await BotDB.user_messages.delete_expired(before)
-        deleted_offers = 0
+        now_msk = datetime.utcnow() + timedelta(hours=3)
+
+        offers = await BotDB.offers.read_by_filter({}) or []
+        if not offers:
+            return 0
+
         try:
-            deleted_offers = await BotDB.offers.delete_expired(before)
+            offers.sort(key=lambda o: getattr(o, 'created_at', now_msk), reverse=True)
+            latest_offer = offers[0] if offers else None
+        except Exception:
+            latest_offer = offers[0] if offers else None
+
+        if not latest_offer:
+            return 0
+
+        expire_at = getattr(latest_offer, 'expire_at', None)
+        if not expire_at or now_msk < expire_at:
+            return 0
+
+        deleted_offers = 0
+        deleted_msgs = 0
+        deleted_motivations = 0
+
+        try:
+            deleted_offers = await BotDB.offers.delete_expired(now_msk)
         except Exception as es:
             logger_msg(f"Delete expired offers error: {es}")
-        deleted_motivations = 0
+
+        try:
+            deleted_msgs = await BotDB.user_messages.delete_expired(now_msk)
+        except Exception as es:
+            logger_msg(f"Delete expired user messages error: {es}")
+
         try:
             deleted_motivations = await BotDB.motivations.delete_all()
         except Exception as es:
@@ -223,6 +257,8 @@ class PaymentScheduler:
                         tasks.append(check_payments_once())
                     idx_exp = len(tasks)
                     tasks.append(check_expired_messages_once())
+                    idx_revert = len(tasks)
+                    tasks.append(revert_payment_messages_once())
                     idx_offer = len(tasks)
                     tasks.append(send_latest_offer_to_waiting_users())
 
@@ -230,6 +266,7 @@ class PaymentScheduler:
 
                     count_pay = 0 if idx_pay is None else results[idx_pay]
                     count_exp = results[idx_exp]
+                    count_revert = results[idx_revert]
                     sent_offer = results[idx_offer]
 
                     if isinstance(count_pay, Exception):
@@ -241,6 +278,11 @@ class PaymentScheduler:
                         logger_msg(f"❌ Ошибка одноразовой очистки просроченных: {count_exp}")
                     elif (count_exp or 0) > 0:
                         print(f"🧹 Удалено просроченных сообщений: {int(count_exp)}")
+
+                    if isinstance(count_revert, Exception):
+                        logger_msg(f"❌ Ошибка отката сообщений оплаты: {count_revert}")
+                    elif (count_revert or 0) > 0:
+                        print(f"🔁 Сообщений откатено к выбору оплаты: {int(count_revert)}")
 
                     if isinstance(sent_offer, Exception):
                         logger_msg(f"❌ Ошибка рассылки свежего оффера: {sent_offer}")

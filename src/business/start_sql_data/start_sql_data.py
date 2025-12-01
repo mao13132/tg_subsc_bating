@@ -15,4 +15,6 @@ async def start_sql_data(BotDB):
 
     await init_texts_from_json(BotDB)
 
+    # await __import__('src.sql.test_users_seed', fromlist=['seed_test_users']).seed_test_users(BotDB)
+
     return True

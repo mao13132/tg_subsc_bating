@@ -26,6 +26,8 @@ class States(StatesGroup):
 
     get_summa_motivation = State()
 
+    find_user = State()
+
 
 class EditTextState(StatesGroup):
     waiting_new_text = State()
@@ -64,6 +66,9 @@ MOKE_SCHEDULE_PAYMENTS_TASK = True
 SEND_SUCCESS_PAYMENTS = False
 
 CHECK_PAYMENT_EVERY = 30
+
+# Сколько минут живёт созданный счёт на оплату
+PAYMENT_TIMEOUT_MINUTES = 1
 
 SETTINGS_CHATS = {
     'analytic_chat': {

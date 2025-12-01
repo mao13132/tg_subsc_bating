@@ -1,6 +1,7 @@
 from aiogram import Dispatcher, types
 
 from settings import States, EditTextState
+from src.business.users.users_search_state_ import users_search_state
 from src.business.bet_menu.set_bet.get_summa_forecast_state_ import get_summa_forecast_state
 from src.business.bet_menu.set_bet.get_timer_bet_state_ import get_timer_bet_state
 from src.business.bet_menu.set_bet.get_summa_offer_state_ import get_summa_offer_state
@@ -39,3 +40,5 @@ def register_state(dp: Dispatcher):
     dp.register_message_handler(posts_state, state=PostsStates.waiting_new_post, content_types=[types.ContentType.ANY])
 
     dp.register_message_handler(broadcast_state, state=BroadcastStates.waiting_broadcast, content_types=[types.ContentType.ANY])
+
+    dp.register_message_handler(users_search_state, state=States.find_user, content_types=['text'])

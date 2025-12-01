@@ -35,6 +35,8 @@ class Admin_keyb:
 
         self._start_key.add(InlineKeyboardButton(text=f'🏞 Логотип к сообщениям', callback_data='logo_change_call'))
 
+        self._start_key.add(InlineKeyboardButton(text=f'👤 Управление пользователями', callback_data='users'))
+
         self._start_key.add(InlineKeyboardButton(text=f'🔙 Назад', callback_data='over_state'))
 
         return self._start_key
@@ -157,6 +159,37 @@ class Admin_keyb:
 
         self._start_key.add(InlineKeyboardButton(text=btn_text, url=client_payment_link))
 
+        return self._start_key
+
+    def payment_link_back_keyb(self, btn_text, client_payment_link, back_amount: int, admin_text: str = '', admin_link: str = ''):
+        self._start_key = InlineKeyboardMarkup(row_width=1)
+
+        if admin_text:
+            self._start_key.add(InlineKeyboardButton(text=admin_text, url=admin_link))
+
+        self._start_key.add(InlineKeyboardButton(text=btn_text, url=client_payment_link))
+
+        self._start_key.add(InlineKeyboardButton(text='🔙 Назад', callback_data=f'back_payment_choose-{int(back_amount)}'))
+
+        return self._start_key
+
+    def payment_choose(self, pay_rub_text: str, pay_other_text: str, amount_rub: int):
+        self._start_key = InlineKeyboardMarkup(row_width=1)
+
+        self._start_key.add(InlineKeyboardButton(text=pay_rub_text, callback_data=f'create_payment-{int(amount_rub)}'))
+
+        self._start_key.add(InlineKeyboardButton(text=pay_other_text, callback_data='pay_other'))
+
+        return self._start_key
+
+    def payment_wait_keyb(self):
+        self._start_key = InlineKeyboardMarkup(row_width=1)
+        self._start_key.add(InlineKeyboardButton(text='⏳ Формируем счёт...', callback_data='wait'))
+        return self._start_key
+
+    def back_payment_choose(self, amount_rub: int):
+        self._start_key = InlineKeyboardMarkup(row_width=1)
+        self._start_key.add(InlineKeyboardButton(text='🔙 Назад', callback_data=f'back_payment_choose-{int(amount_rub)}'))
         return self._start_key
 
     def approve_send_forecast(self):

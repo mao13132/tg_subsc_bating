@@ -82,6 +82,22 @@ async def check_need_paid(ctx):
 
     # 3) Нужна оплата
     if getattr(data_user, 'need_paid', False):
+        # Бесплатная мотивация: если активная мотивация с суммой 0 — пропускаем блокировку
+        motivations = await BotDB.motivations.read_by_filter({}) or []
+        now = datetime.utcnow()
+        try:
+            motivations.sort(key=lambda m: getattr(m, 'created_at', now), reverse=True)
+            motivation = motivations[0] if motivations else None
+        except Exception:
+            motivation = motivations[0] if motivations else None
+
+        try:
+            is_free = bool(motivation) and int(getattr(motivation, 'summa', 0) or 0) == 0
+        except Exception:
+            is_free = False
+
+        if is_free:
+            return False
         # 3.1) Текст и кнопка
         template = await text_manager.get_message('no_paid_msg')
         btn_text = await text_manager.get_button_text('paid')

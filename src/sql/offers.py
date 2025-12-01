@@ -1,10 +1,14 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Any, Optional, List
 
 from sqlalchemy import Column, Integer, String, DateTime, select, insert, update, delete
 
 from settings import Base
 from src.utils.logger._logger import logger_msg
+
+
+def now_msk():
+    return datetime.utcnow() + timedelta(hours=3)
 
 
 class Offer(Base):
@@ -24,9 +28,9 @@ class Offer(Base):
 
     expire_at = Column(DateTime, nullable=True)
 
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at = Column(DateTime, nullable=False, default=now_msk)
 
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=False, default=now_msk, onupdate=now_msk)
 
 
 class Motivation(Base):
@@ -38,7 +42,7 @@ class Motivation(Base):
 
     id_users = Column(String, nullable=True)
 
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at = Column(DateTime, nullable=False, default=now_msk)
 
 
 class OffersCRUD:

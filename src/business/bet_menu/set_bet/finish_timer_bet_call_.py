@@ -77,7 +77,14 @@ async def finish_timer_bet_call(call: types.CallbackQuery, state: FSMContext):
     offer_id = await BotDB.offers.create(offer_data)
 
     # 9. Получаем аудиторию — все кто нажал получить прогноз в ПРЕДЛОЖЕНИЕ
-    audience_ids = await BotDB.get_users_by_filter(filters={'get_offer': True, 'is_subs': True, 'need_paid': False})
+    try:
+        offer_summa = int(str(summa)) if str(summa).isdigit() else 0
+    except Exception:
+        offer_summa = 0
+    filters = {'get_offer': True, 'is_subs': True}
+    if offer_summa > 0:
+        filters['need_paid'] = False
+    audience_ids = await BotDB.get_users_by_filter(filters=filters)
 
     # 10. Рассылаем контент оффера аудитории
     ok_ids = await send_offer_to_audience({

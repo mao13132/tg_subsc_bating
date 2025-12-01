@@ -8,7 +8,7 @@
 # ---------------------------------------------
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, select, insert, update, delete, Boolean, DateTime, func, case
+from sqlalchemy import Column, Integer, String, select, insert, update, delete, Boolean, DateTime, func, case, or_
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -17,6 +17,7 @@ from src.sql.texts import TextsCRUD
 from src.sql.user_messages import UserMessageCRUD
 from src.sql.payments import PaymentsCRUD
 from src.sql.offers import OffersCRUD, MotivationsCRUD
+from src.sql.payment_messages import PaymentMessagesCRUD
 from src.utils.logger._logger import logger_msg
 from src.utils.telegram_debug import SendlerOneCreate
 
@@ -97,6 +98,8 @@ class BotDB:
             self.offers = OffersCRUD(self.async_session_maker)
             # Инициализируем CRUD для мотивационных рассылок
             self.motivations = MotivationsCRUD(self.async_session_maker)
+            # Инициализируем CRUD для сообщений со ссылкой на оплату
+            self.payment_messages = PaymentMessagesCRUD(self.async_session_maker)
         except Exception as es:
             error_ = f'SQL не могу создать подключение "{es}"'
 
@@ -351,6 +354,32 @@ class BotDB:
                 return result.scalars().all()
         except Exception as es:
             error_ = f'SQL get_users_by_filter: "{es}"'
+            logger_msg(error_)
+            return []
+
+    async def search_users(self, q: str):
+        try:
+            q = str(q or '').strip()
+            if not q:
+                return []
+            login_q = q
+            if login_q.startswith('@'):
+                login_q = login_q[1:]
+            if login_q.startswith('https://t.me/'):
+                login_q = login_q.split('/')[-1]
+
+            async with self.async_session_maker() as session:
+                query = select(Users).where(
+                    or_(
+                        Users.login.ilike(f'%{login_q}%'),
+                        Users.id_user == q,
+                        Users.id_user.ilike(f'%{login_q}%')
+                    )
+                )
+                result = await session.execute(query)
+                return result.scalars().all()
+        except Exception as es:
+            error_ = f'SQL search_users: "{es}"'
             logger_msg(error_)
             return []
 

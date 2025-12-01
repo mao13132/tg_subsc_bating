@@ -26,7 +26,7 @@ async def build_motivation_state(message: Message, state: FSMContext):
 
     keyboard = Admin_keyb().back_bets_menu()
 
-    if not str(summa).isdigit() or int(summa) <= 0:
+    if not str(summa).isdigit() or int(summa) < 0:
         error_ = f'❌ Вы ввели не корректную сумму предложения, пожалуйста введите ещё раз...'
 
         await Sendler_msg().sendler_photo_message(message, LOGO, error_, keyboard)

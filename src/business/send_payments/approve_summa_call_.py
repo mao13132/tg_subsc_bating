@@ -78,8 +78,8 @@ async def approve_summa_call(call: types.CallbackQuery, state: FSMContext):
         _msg = (
             f'✅ Рассылка выполнена\n'
             f'Сумма: {summa}\n'
-            f'Пользователей: {res_send["sent"]}\n'
-            f'Успешных доставок:{res_send["total"]}\n'
+            f'Пользователей: {res_send["total"]}\n'
+            f'Успешных доставок:{res_send["sent"]}\n'
             f'Ошибки: {res_send["failed"]}'
         )
 

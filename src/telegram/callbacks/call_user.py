@@ -10,7 +10,6 @@ from src.business.bet_menu.set_bet.set_bet_call_ import set_bet_call
 from src.business.chat_admin.add_chat_admin_call_ import add_chat_admin_call
 from src.business.chat_admin.chat_admin_call_ import chat_admin_call
 from src.business.get_forecast.get_forecast_call_ import get_forecast_call
-from src.business.get_offer.get_offer_call_ import get_offer_call
 from src.business.get_offer_client.get_offer_client_call_ import get_offer_client_call
 from src.business.logo.logo_change_call_ import logo_change_call
 from src.business.managers.add_managers_call import add_managers_call
@@ -21,15 +20,18 @@ from src.business.repid_motivations.repid_motivations_call_ import repid_motivat
 from src.business.send_forecast.approve_forecast_call_ import approve_forecast_call
 from src.business.send_forecast.send_forecast_call_ import send_forecast_call
 from src.business.send_payments.approve_summa_call_ import approve_summa_call
-from src.business.bet_menu.set_bet.finish_timer_bet_call_ import finish_timer_bet_call
 from src.business.bet_menu.set_bet.start_summa_offer_call_ import start_summa_offer_call
 from src.business.bet_menu.set_bet.repeat_offers_confirm_call_ import repeat_offers_confirm_call
 from src.business.send_payments.send_payments_call_ import send_payments_call
 from src.business.payments.repeat_old_payments_call_ import repeat_old_payments_call
+from src.business.payments.create_payment_call_ import create_payment_call, pay_other_call, back_payment_choose_call
 from src.business.start_one.start_one import start_one
 from src.business.text_edit.edit_text_call import edit_text_button_call, edit_text_message_call
 from src.business.text_edit.text_keyboards_call import text_keyboards_call
 from src.business.text_edit.text_msg_call import text_msg_call
+from src.business.users.users_call_ import users_call, users_find_call, users_find_list_call
+from src.business.users.user_item_call_ import user_item_call
+from src.business.users.user_reset_call_ import user_reset_all_call, user_reset_bill_call
 from src.telegram.sendler.sendler import *
 
 from src.telegram.keyboard.keyboards import *
@@ -119,6 +121,18 @@ def register_callbacks(dp: Dispatcher):
 
     dp.register_callback_query_handler(get_offer_client_call, text='get_offer_client', state='*')
 
-    dp.register_callback_query_handler(get_offer_call, text_contains='get_offer-', state='*')
+    # dp.register_callback_query_handler(get_offer_call, text_contains='get_offer-', state='*')
 
     dp.register_callback_query_handler(build_motivation_call, text='motivation', state='*')
+
+    dp.register_callback_query_handler(create_payment_call, text_contains='create_payment-', state='*')
+    dp.register_callback_query_handler(pay_other_call, text='pay_other', state='*')
+    dp.register_callback_query_handler(back_payment_choose_call, text_contains='back_payment_choose-', state='*')
+
+    dp.register_callback_query_handler(users_call, text='users', state='*')
+    dp.register_callback_query_handler(users_call, text_contains='users_list-', state='*')
+    dp.register_callback_query_handler(users_find_call, text='users_find', state='*')
+    dp.register_callback_query_handler(users_find_list_call, text_contains='users_find_list-', state='*')
+    dp.register_callback_query_handler(user_item_call, text_contains='user_item-', state='*')
+    dp.register_callback_query_handler(user_reset_all_call, text_contains='user_reset_all-', state='*')
+    dp.register_callback_query_handler(user_reset_bill_call, text_contains='user_reset_bill-', state='*')

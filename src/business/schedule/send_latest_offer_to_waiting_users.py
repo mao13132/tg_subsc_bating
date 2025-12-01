@@ -33,8 +33,15 @@ async def send_latest_offer_to_waiting_users():
     if not offer:
         return False
 
-    # 3) Получаем аудиторию для рассылки: ждут оффер, подписаны, без долга
-    users = await BotDB.get_users_by_filter(filters={'get_offer': True, 'is_subs': True, 'need_paid': False}) or []
+    # 3) Получаем аудиторию для рассылки: ждут оффер, подписаны
+    try:
+        offer_summa = int(getattr(offer, 'summa', 0) or 0)
+    except Exception:
+        offer_summa = 0
+    filters = {'get_offer': True, 'is_subs': True}
+    if offer_summa > 0:
+        filters['need_paid'] = False
+    users = await BotDB.get_users_by_filter(filters=filters) or []
     # 4) Пустая аудитория — завершаем
     if not users:
         return False
