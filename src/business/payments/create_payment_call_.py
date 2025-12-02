@@ -134,6 +134,8 @@ async def create_payment_call(call: types.CallbackQuery, state: FSMContext):
 async def pay_other_call(call: types.CallbackQuery, state: FSMContext):
     await Sendler_msg.log_client_call(call)
 
+    id_user = call.message.chat.id
+
     uid = str(
         getattr(call, 'from_user', None).id
         if getattr(call, 'from_user', None)
@@ -162,10 +164,10 @@ async def pay_other_call(call: types.CallbackQuery, state: FSMContext):
             "🌍 Для оплаты из других\n"
             "стран напишите @plutoshelp\n\n"
             "Обязательно отправьте ему\n"
-            "номер аккаунт: 1078134881\n\n"
+            "номер аккаунт: {}\n\n"
             "К оплате {summa} рублей (будет переведено на вашу валюту)"
         )
-    client_message = template.format(summa=amount)
+    client_message = template.format(summa=amount, id=f"<code>{id_user}</code>")
 
     keyboard = Admin_keyb().back_payment_choose(amount)
     try:

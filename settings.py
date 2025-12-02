@@ -68,7 +68,7 @@ SEND_SUCCESS_PAYMENTS = False
 CHECK_PAYMENT_EVERY = 30
 
 # Сколько минут живёт созданный счёт на оплату
-PAYMENT_TIMEOUT_MINUTES = 1
+PAYMENT_TIMEOUT_MINUTES = 60
 
 SETTINGS_CHATS = {
     'analytic_chat': {
