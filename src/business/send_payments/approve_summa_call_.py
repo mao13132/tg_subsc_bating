@@ -47,6 +47,9 @@ async def approve_summa_call(call: types.CallbackQuery, state: FSMContext):
         admin_text = await text_manager.get_button_text('admin_text')
 
         replacement_text = await text_manager.get_message('replacement')
+
+        replacement_text = replacement_text.format(summa=0)
+
         get_forecast_btn = await text_manager.get_button_text('get_forecast')
         keyb_forecast = Admin_keyb().forecast_call_keyb(get_forecast_btn, admin_text, admin_link)
 
